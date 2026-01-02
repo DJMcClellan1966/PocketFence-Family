@@ -5,6 +5,13 @@ namespace PocketFence_AI.Dashboard.Pages;
 
 public class IndexModel : PageModel
 {
+    private readonly BlockedContentStore _blockedContent;
+
+    public IndexModel(BlockedContentStore blockedContent)
+    {
+        _blockedContent = blockedContent;
+    }
+
     public string Username { get; set; } = "Parent";
     public int BlockedToday { get; set; }
     public int BlockedThisWeek { get; set; }
@@ -23,37 +30,31 @@ public class IndexModel : PageModel
 
         Username = HttpContext.Session.GetString("Username") ?? "Parent";
 
-        // TODO: Load real data from your ContentFilter/SimpleAI
-        // For now, using sample data for MVP
-        LoadSampleData();
+        // Load real data from BlockedContentStore
+        LoadRealData();
 
         return Page();
     }
 
-    private void LoadSampleData()
+    private void LoadRealData()
     {
-        BlockedToday = 3;
-        BlockedThisWeek = 17;
-        BlockedThisMonth = 64;
-        BlockedAllTime = 248;
+        // Get statistics
+        BlockedToday = _blockedContent.GetBlockedToday();
+        BlockedThisWeek = _blockedContent.GetBlockedThisWeek();
+        BlockedThisMonth = _blockedContent.GetBlockedThisMonth();
+        BlockedAllTime = _blockedContent.GetBlockedAllTime();
 
-        RecentBlocks = new List<BlockedItem>
+        // Get recent blocks (top 5)
+        var recentEntries = _blockedContent.GetRecent(5);
+        RecentBlocks = recentEntries.Select(e => new BlockedItem
         {
-            new() { Time = DateTime.Now.AddMinutes(-5), Content = "inappropriate-site.com", Reason = "Adult Content" },
-            new() { Time = DateTime.Now.AddMinutes(-23), Content = "violent-game.com", Reason = "Violence" },
-            new() { Time = DateTime.Now.AddHours(-2), Content = "how to hack wifi", Reason = "Dangerous Activity" },
-        };
+            Time = e.Timestamp,
+            Content = e.Content,
+            Reason = e.Reason
+        }).ToList();
 
-        BlocksByCategory = new Dictionary<string, int>
-        {
-            { "Adult Content", 89 },
-            { "Violence", 52 },
-            { "Hate Speech", 12 },
-            { "Dangerous Activities", 31 },
-            { "Gambling", 18 },
-            { "Drugs", 24 },
-            { "Other", 22 }
-        };
+        // Get blocks by category
+        BlocksByCategory = _blockedContent.GetBlocksByCategory();
     }
 }
 

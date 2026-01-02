@@ -5,8 +5,14 @@ namespace PocketFence_AI.Dashboard;
 
 public static class DashboardService
 {
+    // Singleton instances for data storage
+    public static BlockedContentStore BlockedContent { get; } = new BlockedContentStore();
+
     public static void ConfigureDashboard(WebApplicationBuilder builder)
     {
+        // Register singleton services
+        builder.Services.AddSingleton(BlockedContent);
+
         // Add Razor Pages services with custom root path
         builder.Services.AddRazorPages()
             .AddRazorPagesOptions(options =>
@@ -62,17 +68,25 @@ public static class DashboardService
         });
         
         // Configure web server
-        builder.WebHost.UseUrls("http://localhost:5000");
-
+        //builder.WebHost.UseUrls("http://localhost:5000");
+        builder.WebHost.UseUrls("http://0.0.0.0:5000");
         ConfigureDashboard(builder);
 
         var app = builder.Build();
 
         UseDashboard(app);
 
+        // Add sample data if no blocks exist (for testing)
+        if (BlockedContent.GetBlockedAllTime() == 0)
+        {
+            Console.WriteLine("📝 No blocked content found, adding sample data...");
+            SeedData.AddSampleBlocks(BlockedContent);
+        }
+
         Console.WriteLine("🛡️  PocketFence Dashboard started at http://localhost:5000");
         Console.WriteLine("📝 Login with: admin / admin");
         Console.WriteLine($"📁 Static files: {app.Environment.WebRootPath}");
+        Console.WriteLine($"📊 Blocked content: {BlockedContent.GetBlockedAllTime()} total");
         
         app.Run();
     }

@@ -10,6 +10,7 @@ public class Program
 {
     private static readonly SimpleAI _ai = new SimpleAI();
     private static readonly ContentFilter _filter = new ContentFilter();
+    private static readonly Dashboard.BlockedContentStore _blockedStore = Dashboard.DashboardService.BlockedContent;
     
     public static async Task Main(string[] args)
     {
@@ -119,6 +120,13 @@ public class Program
         if (result.IsBlocked || aiScore > 0.7)
         {
             Console.WriteLine($"   ⚠️  Recommendation: {(result.IsBlocked ? "Block" : "Monitor")}");
+            
+            // Save to blocked content store if blocked
+            if (result.IsBlocked)
+            {
+                _blockedStore.AddBlock(url, result.Reason);
+                Console.WriteLine($"   📝 Saved to blocked content log");
+            }
         }
     }
     

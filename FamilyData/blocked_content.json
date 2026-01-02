@@ -1,0 +1,32 @@
+[
+  {
+    "Timestamp": "2026-01-02T16:29:25.9024421-05:00",
+    "Content": "inappropriate-site.com/page1",
+    "Reason": "Domain \u0027inappropriate-site.com\u0027 is in blocklist",
+    "Category": "Adult Content"
+  },
+  {
+    "Timestamp": "2026-01-02T16:29:25.9170418-05:00",
+    "Content": "violent-game.com/download",
+    "Reason": "Contains blocked keyword \u0027violent\u0027",
+    "Category": "Violence"
+  },
+  {
+    "Timestamp": "2026-01-02T16:29:25.917552-05:00",
+    "Content": "how to hack wifi password",
+    "Reason": "Contains blocked keyword \u0027hack\u0027",
+    "Category": "Dangerous Activities"
+  },
+  {
+    "Timestamp": "2026-01-02T16:29:25.9180342-05:00",
+    "Content": "online-casino.net/play",
+    "Reason": "Contains blocked keyword \u0027gambling\u0027",
+    "Category": "Gambling"
+  },
+  {
+    "Timestamp": "2026-01-02T16:29:25.9185817-05:00",
+    "Content": "hate-forum.org/posts",
+    "Reason": "Domain \u0027hate-forum.org\u0027 is in blocklist",
+    "Category": "Hate Speech"
+  }
+]

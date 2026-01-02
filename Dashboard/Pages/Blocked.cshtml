@@ -42,7 +42,7 @@
                 @foreach (var block in Model.BlockedItems)
                 {
                     <tr>
-                        <td><small>@block.Time.ToString("MM/dd/yyyy HH:mm")</small></td>
+                        <td><small>@block.Timestamp.ToString("MM/dd/yyyy HH:mm")</small></td>
                         <td>@block.Content</td>
                         <td><span class="badge bg-warning">@block.Category</span></td>
                         <td><small>@block.Reason</small></td>

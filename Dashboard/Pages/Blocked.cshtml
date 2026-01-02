@@ -5,26 +5,50 @@
 }
 
 <div class="row mb-4">
-    <div class="col">
+    <div class="col-md-8">
         <h1>Blocked Content</h1>
         <p class="text-muted">Complete history of blocked URLs and content</p>
     </div>
+    <div class="col-md-4 text-end">
+        <a href="/blocked?handler=Export" class="btn btn-success">
+            <i class="bi bi-download"></i> Export to CSV
+        </a>
+    </div>
 </div>
 
-<div class="row mb-3">
-    <div class="col-md-8">
-        <input type="text" class="form-control" placeholder="Search blocked content..." id="searchBox">
+<form method="get" class="row mb-3">
+    <div class="col-md-6">
+        <input type="text" class="form-control" name="search" placeholder="Search blocked content..." value="@Model.SearchQuery">
     </div>
     <div class="col-md-4">
-        <select class="form-select" id="categoryFilter">
+        <select class="form-select" name="category" onchange="this.form.submit()">
             <option value="">All Categories</option>
-            <option value="adult">Adult Content</option>
-            <option value="violence">Violence</option>
-            <option value="hate">Hate Speech</option>
-            <option value="dangerous">Dangerous Activities</option>
+            @foreach (var cat in Model.AvailableCategories)
+            {
+                <option value="@cat" selected="@(Model.CategoryFilter == cat)">@cat</option>
+            }
         </select>
     </div>
-</div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">Search</button>
+    </div>
+</form>
+
+@if (!string.IsNullOrWhiteSpace(Model.SearchQuery) || !string.IsNullOrWhiteSpace(Model.CategoryFilter))
+{
+    <div class="alert alert-info">
+        Showing @Model.BlockedItems.Count results
+        @if (!string.IsNullOrWhiteSpace(Model.SearchQuery))
+        {
+            <text> for "@Model.SearchQuery"</text>
+        }
+        @if (!string.IsNullOrWhiteSpace(Model.CategoryFilter))
+        {
+            <text> in category "@Model.CategoryFilter"</text>
+        }
+        <a href="/blocked" class="btn btn-sm btn-outline-secondary ms-2">Clear Filters</a>
+    </div>
+}
 
 <div class="card">
     <div class="card-body">

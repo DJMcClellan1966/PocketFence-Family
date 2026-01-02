@@ -1,32 +1,86 @@
 [
   {
-    "Timestamp": "2026-01-02T16:29:25.9024421-05:00",
+    "Timestamp": "2026-01-02T17:57:27.6056241-05:00",
     "Content": "inappropriate-site.com/page1",
     "Reason": "Domain \u0027inappropriate-site.com\u0027 is in blocklist",
     "Category": "Adult Content"
   },
   {
-    "Timestamp": "2026-01-02T16:29:25.9170418-05:00",
+    "Timestamp": "2026-01-02T17:57:27.6333818-05:00",
     "Content": "violent-game.com/download",
     "Reason": "Contains blocked keyword \u0027violent\u0027",
     "Category": "Violence"
   },
   {
-    "Timestamp": "2026-01-02T16:29:25.917552-05:00",
+    "Timestamp": "2026-01-02T17:57:27.6338133-05:00",
     "Content": "how to hack wifi password",
     "Reason": "Contains blocked keyword \u0027hack\u0027",
     "Category": "Dangerous Activities"
   },
   {
-    "Timestamp": "2026-01-02T16:29:25.9180342-05:00",
+    "Timestamp": "2026-01-02T17:57:27.6343094-05:00",
     "Content": "online-casino.net/play",
     "Reason": "Contains blocked keyword \u0027gambling\u0027",
     "Category": "Gambling"
   },
   {
-    "Timestamp": "2026-01-02T16:29:25.9185817-05:00",
+    "Timestamp": "2026-01-02T17:57:27.6347699-05:00",
     "Content": "hate-forum.org/posts",
     "Reason": "Domain \u0027hate-forum.org\u0027 is in blocklist",
     "Category": "Hate Speech"
+  },
+  {
+    "Timestamp": "2026-01-02T17:59:29.9577066-05:00",
+    "Content": "adult-content.com",
+    "Reason": "Domain \u0027adult-content.com\u0027 is in blocklist",
+    "Category": "Adult Content"
+  },
+  {
+    "Timestamp": "2026-01-02T17:59:29.9719052-05:00",
+    "Content": "gambling.org",
+    "Reason": "Domain \u0027gambling.org\u0027 is in blocklist",
+    "Category": "Gambling"
+  },
+  {
+    "Timestamp": "2026-01-02T17:59:29.9747793-05:00",
+    "Content": "malicious.com",
+    "Reason": "Domain \u0027malicious.com\u0027 is in blocklist",
+    "Category": "Other"
+  },
+  {
+    "Timestamp": "2026-01-02T17:59:29.9766876-05:00",
+    "Content": "phishing.net",
+    "Reason": "Domain \u0027phishing.net\u0027 is in blocklist",
+    "Category": "Malware/Phishing"
+  },
+  {
+    "Timestamp": "2026-01-02T17:59:29.9781615-05:00",
+    "Content": "illegal-downloads.net",
+    "Reason": "Domain \u0027illegal-downloads.net\u0027 is in blocklist",
+    "Category": "Other"
+  },
+  {
+    "Timestamp": "2026-01-02T17:59:29.9797837-05:00",
+    "Content": "violence-game.com",
+    "Reason": "Contains blocked keyword \u0027violence\u0027",
+    "Category": "Violence"
+  },
+  {
+    "Timestamp": "2026-01-02T17:59:29.9822235-05:00",
+    "Content": "drugs-online.com",
+    "Reason": "Contains blocked keyword \u0027drugs\u0027",
+    "Category": "Drugs"
+  },
+  {
+    "Timestamp": "2026-01-02T17:59:29.9845875-05:00",
+    "Content": "weapons-store.com",
+    "Reason": "Contains blocked keyword \u0027weapons\u0027",
+    "Category": "Other"
+  },
+  {
+    "Timestamp": "2026-01-02T17:59:29.9860592-05:00",
+    "Content": "adult-video.net",
+    "Reason": "Contains blocked keyword \u0027adult\u0027",
+    "Category": "Adult Content"
   }
 ]

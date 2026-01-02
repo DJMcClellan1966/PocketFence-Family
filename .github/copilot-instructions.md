@@ -1,24 +1,26 @@
-# PocketFence-Simple
+# PocketFence-AI
 
-A C# Windows desktop application that enables parents to use their device's hotspot capability to block malicious content from children's devices when connected to the hotspot.
+A lightweight local content filtering system optimized for local inference without external dependencies.
 
 ## Key Features
-- Network monitoring and device detection
-- Content filtering and blocking  
-- Parental control dashboard
-- Device management for connected children's devices
-- Real-time threat detection and blocking
+- Local AI inference for content analysis
+- URL and text content filtering
+- Real-time threat detection
+- Privacy-first (all processing happens locally)
+- Simple command-line interface
+- Cross-platform support
 
 ## Development Guidelines
-- Use .NET Framework/Core for Windows desktop application
+- Use .NET 8.0 for cross-platform compatibility
 - Follow C# coding best practices
 - Implement proper error handling and logging
-- Use appropriate networking libraries for hotspot management
-- Ensure secure handling of network traffic and filtering rules
+- Keep dependencies minimal
+- Optimize for local inference performance
+- Ensure all processing remains local (no external API calls)
 
 ## Architecture
-- Windows Forms or WPF for the user interface
-- Network service layer for hotspot and device management
-- Content filtering engine
-- Configuration and settings management
-- Logging and monitoring components
+- SimpleAI: Lightweight AI engine for threat detection
+- ContentFilter: URL-based filtering with domain blocklists
+- Program (CLI): Interactive command-line interface
+- Minimal configuration via appsettings.json
+- No external dependencies or APIs required

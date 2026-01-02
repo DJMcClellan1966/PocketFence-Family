@@ -1,0 +1,108 @@
+@page
+@model SettingsModel
+@{
+    ViewData["Title"] = "Settings";
+}
+
+<div class="row mb-4">
+    <div class="col">
+        <h1>Settings</h1>
+        <p class="text-muted">Configure PocketFence protection</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Filtering Settings</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Filtering Level</label>
+                        <select class="form-select" name="filterLevel">
+                            <option value="strict">Strict (Recommended for young children)</option>
+                            <option value="moderate" selected>Moderate (Balanced protection)</option>
+                            <option value="relaxed">Relaxed (Teenagers)</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Content Categories to Block</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="adult" id="block-adult" checked>
+                            <label class="form-check-label" for="block-adult">Adult Content</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="violence" id="block-violence" checked>
+                            <label class="form-check-label" for="block-violence">Violence</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="hate" id="block-hate" checked>
+                            <label class="form-check-label" for="block-hate">Hate Speech</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="drugs" id="block-drugs" checked>
+                            <label class="form-check-label" for="block-drugs">Drugs & Alcohol</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="gambling" id="block-gambling">
+                            <label class="form-check-label" for="block-gambling">Gambling</label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Notification Email</label>
+                        <input type="email" class="form-control" name="notificationEmail" 
+                               placeholder="parent@example.com" value="@Model.NotificationEmail">
+                        <small class="form-text text-muted">Receive alerts for blocked content</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Save Settings</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Custom Blocklist</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Add Domain to Block</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="example.com" id="customBlock">
+                        <button class="btn btn-outline-secondary" type="button">Add</button>
+                    </div>
+                </div>
+                <div>
+                    <small class="text-muted">Custom blocked domains: None yet</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Quick Stats</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Protection Status:</strong> <span class="badge bg-success">Active</span></p>
+                <p><strong>Last Update:</strong> @DateTime.Now.ToString("MM/dd/yyyy")</p>
+                <p><strong>Version:</strong> 1.0.0</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5>Need Help?</h5>
+            </div>
+            <div class="card-body">
+                <p><small>Check out our documentation or contact support.</small></p>
+                <a href="#" class="btn btn-sm btn-outline-primary">Documentation</a>
+            </div>
+        </div>
+    </div>
+</div>

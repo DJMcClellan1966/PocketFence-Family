@@ -13,6 +13,14 @@ public class Program
     
     public static async Task Main(string[] args)
     {
+        // Check for dashboard mode
+        if (args.Length > 0 && args[0].ToLower() == "dashboard")
+        {
+            Console.WriteLine("🛡️  Starting PocketFence Dashboard...");
+            PocketFence_AI.Dashboard.DashboardService.StartDashboard(args);
+            return;
+        }
+
         Console.WriteLine("🤖 PocketFence AI - Local Content Filter v1.0");
         Console.WriteLine("Optimized for local inference without external dependencies");
         Console.WriteLine();
@@ -65,6 +73,11 @@ public class Program
                 case "stats":
                     ShowStats();
                     break;
+                case "dashboard":
+                    Console.WriteLine("🛡️  Starting dashboard...");
+                    Console.WriteLine("Run: dotnet run dashboard");
+                    Console.WriteLine("Or restart with 'dashboard' argument");
+                    break;
                 case "clear":
                     Console.Clear();
                     break;
@@ -81,6 +94,7 @@ public class Program
         Console.WriteLine("  check <url>      - Check if URL should be blocked");
         Console.WriteLine("  analyze <text>   - Analyze text content for safety");
         Console.WriteLine("  stats            - Show filtering statistics");
+        Console.WriteLine("  dashboard        - Instructions to start web dashboard");
         Console.WriteLine("  clear            - Clear screen");
         Console.WriteLine("  help             - Show this help");
         Console.WriteLine("  exit             - Exit program");

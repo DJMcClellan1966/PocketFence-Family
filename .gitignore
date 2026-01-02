@@ -1,0 +1,40 @@
+# Build Outputs
+bin/
+obj/
+out/
+publish/
+
+# Debug files
+*.pdb
+*.log
+
+# IDE files
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.userprefs
+
+# NuGet packages
+packages/
+*.nupkg
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
+
+# Configuration files with secrets
+appsettings.local.json
+appsettings.*.json
+!appsettings.json
+
+# Node modules (if any)
+node_modules/

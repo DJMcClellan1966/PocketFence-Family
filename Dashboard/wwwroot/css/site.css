@@ -3,6 +3,7 @@
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     background-color: #f8f9fa;
+    padding-bottom: 80px; /* Space for footer */
 }
 
 .navbar-brand {
@@ -26,10 +27,13 @@ body {
     font-weight: bold;
 }
 
+main {
+    min-height: calc(100vh - 150px); /* Ensure content pushes footer down */
+}
+
 .footer {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
+    margin-top: 3rem;
+    padding: 1rem 0;
 }
 
 /* Stats cards */

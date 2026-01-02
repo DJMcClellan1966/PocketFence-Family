@@ -55,14 +55,14 @@ public static class DashboardService
 
     public static void StartDashboard(string[] args)
     {
-        var builder = WebApplication.CreateBuilder(args);
+        var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+        {
+            Args = args,
+            WebRootPath = Path.Combine(Directory.GetCurrentDirectory(), "Dashboard", "wwwroot")
+        });
         
         // Configure web server
         builder.WebHost.UseUrls("http://localhost:5000");
-        
-        // Set web root to Dashboard/wwwroot folder
-        var projectRoot = Directory.GetCurrentDirectory();
-        builder.Environment.WebRootPath = Path.Combine(projectRoot, "Dashboard", "wwwroot");
 
         ConfigureDashboard(builder);
 
@@ -72,7 +72,7 @@ public static class DashboardService
 
         Console.WriteLine("🛡️  PocketFence Dashboard started at http://localhost:5000");
         Console.WriteLine("📝 Login with: admin / admin");
-        Console.WriteLine($"📁 Static files: {builder.Environment.WebRootPath}");
+        Console.WriteLine($"📁 Static files: {app.Environment.WebRootPath}");
         
         app.Run();
     }

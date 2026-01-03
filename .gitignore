@@ -35,6 +35,17 @@ Thumbs.db
 appsettings.local.json
 appsettings.*.json
 !appsettings.json
+appsettings.Production.json
+
+# Apple OAuth Secrets (NEVER COMMIT!)
+Data/AppleAuthKey.p8
+Data/*.p8
+AuthKey_*.p8
+*.p8
+
+# OAuth tokens and credentials
+Data/tokens.json
+Data/oauth_*.json
 
 # Node modules (if any)
 node_modules/

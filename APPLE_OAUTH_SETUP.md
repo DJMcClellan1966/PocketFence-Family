@@ -52,12 +52,15 @@ This is what identifies your web app to Apple's OAuth system.
 - **Primary App ID:** Select `com.pocketfence.family` (from Step 1)
 - **Website URLs:**
   - **Domains and Subdomains:**
-    - For local dev: `localhost` (Apple allows this for testing)
-    - For production: `yourdomain.com` (add later)
-  - **Return URLs:**
-    - For local: `http://localhost:5000/OAuth/AppleCallback`
-    - For production: `https://yourdomain.com/OAuth/AppleCallback`
-    - Click **+** to add more URLs if needed
+    - Enter: `pocketfence.net` (your actual domain - localhost NOT allowed here)
+  - **Return URLs:** (This is where localhost IS allowed)
+    - Click **+** to add: `http://localhost:5000/OAuth/AppleCallback`
+    - Click **+** to add: `https://pocketfence.net/OAuth/AppleCallback`
+    
+⚠️ **Important:** 
+- Domains field requires a REAL domain (not localhost)
+- Return URLs field DOES accept localhost for testing
+- Both URLs can coexist - use localhost for dev, pocketfence.net for production
 
 4. Click **Save** → **Continue** → **Register**
 
@@ -156,6 +159,8 @@ Once your app code is ready, test locally:
 - "Invalid redirect URI" → Check Services ID configuration matches exactly
 - "Invalid client" → Check Client ID in appsettings.json
 - "Invalid client secret" → Check private key file path and Key ID
+- "Localhost invalid in Domains" → Don't put localhost in Domains field, use pocketfence.net
+- "Localhost invalid in Return URLs" → Make sure you include `http://` protocol
 
 ---
 

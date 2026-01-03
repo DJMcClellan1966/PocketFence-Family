@@ -35,37 +35,78 @@
             </div>
             <div class="card-body">
                 <form method="post">
+                    @Html.AntiForgeryToken()
                     <div class="mb-3">
                         <label class="form-label">Filtering Level</label>
-                        <select class="form-select" name="filterLevel">
-                            <option value="strict">Strict (Recommended for young children)</option>
-                            <option value="moderate" selected>Moderate (Balanced protection)</option>
-                            <option value="relaxed">Relaxed (Teenagers)</option>
+                        <select class="form-select" name="filterLevel" id="filterLevelSelect">
+                            <option value="strict" selected="@(Model.FilterLevel == "strict")">🔴 Strict (Recommended for young children)</option>
+                            <option value="moderate" selected="@(Model.FilterLevel == "moderate")">🟡 Moderate (Balanced protection)</option>
+                            <option value="relaxed" selected="@(Model.FilterLevel == "relaxed")">🟢 Relaxed (Teenagers)</option>
                         </select>
+                        
+                        <div class="mt-3 p-3 bg-light rounded" id="filterLevelInfo">
+                            <small class="text-muted">
+                                <div id="strictInfo" style="display: none;">
+                                    <strong>🔴 Strict Mode (Ages 5-12):</strong><br>
+                                    Blocks: adult, gambling, casino, poker, bet, drugs, marijuana, cannabis, weapons, gun, violence, blood, gore, malware, phishing, illegal, torrent, pirate, crack, hack, porn, xxx, explicit, hate, racist, extremist, suicide, self-harm<br>
+                                    <em>Most restrictive - blocks educational content about sensitive topics</em>
+                                </div>
+                                <div id="moderateInfo" style="display: none;">
+                                    <strong>🟡 Moderate Mode (Ages 13-15):</strong><br>
+                                    Blocks: adult, gambling, drugs, weapons, violence, malware, phishing, illegal, torrent, porn, xxx<br>
+                                    <em>Balanced - allows educational content while blocking inappropriate material</em>
+                                </div>
+                                <div id="relaxedInfo" style="display: none;">
+                                    <strong>🟢 Relaxed Mode (Ages 16+):</strong><br>
+                                    Blocks: adult, porn, xxx, explicit, malware, phishing, illegal<br>
+                                    <em>Least restrictive - only blocks explicit content and illegal activities</em>
+                                </div>
+                            </small>
+                        </div>
                     </div>
+                    
+                    <script>
+                        // Show appropriate filter level info
+                        function updateFilterInfo() {
+                            const level = document.getElementById('filterLevelSelect').value;
+                            document.getElementById('strictInfo').style.display = level === 'strict' ? 'block' : 'none';
+                            document.getElementById('moderateInfo').style.display = level === 'moderate' ? 'block' : 'none';
+                            document.getElementById('relaxedInfo').style.display = level === 'relaxed' ? 'block' : 'none';
+                        }
+                        
+                        document.getElementById('filterLevelSelect').addEventListener('change', updateFilterInfo);
+                        // Show current level on page load
+                        updateFilterInfo();
+                    </script>
 
                     <div class="mb-3">
-                        <label class="form-label">Content Categories to Block</label>
+                        <label class="form-label">Additional Category Blocking (Optional)</label>
+                        <small class="form-text text-muted d-block mb-2">
+                            Your filter level already blocks content based on keywords. Check categories below to add extra protection:
+                        </small>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="adult" id="block-adult" checked>
-                            <label class="form-check-label" for="block-adult">Adult Content</label>
+                            <input class="form-check-input" type="checkbox" name="blockedCategories" value="adult" id="block-adult" checked="@(Model.BlockedCategories?.Contains("adult") ?? true)">
+                            <label class="form-check-label" for="block-adult">Adult Content (always recommended)</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="violence" id="block-violence" checked>
+                            <input class="form-check-input" type="checkbox" name="blockedCategories" value="violence" id="block-violence" checked="@(Model.BlockedCategories?.Contains("violence") ?? true)">
                             <label class="form-check-label" for="block-violence">Violence</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="hate" id="block-hate" checked>
+                            <input class="form-check-input" type="checkbox" name="blockedCategories" value="hate" id="block-hate" checked="@(Model.BlockedCategories?.Contains("hate") ?? true)">
                             <label class="form-check-label" for="block-hate">Hate Speech</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="drugs" id="block-drugs" checked>
+                            <input class="form-check-input" type="checkbox" name="blockedCategories" value="drugs" id="block-drugs" checked="@(Model.BlockedCategories?.Contains("drugs") ?? true)">
                             <label class="form-check-label" for="block-drugs">Drugs & Alcohol</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="gambling" id="block-gambling">
+                            <input class="form-check-input" type="checkbox" name="blockedCategories" value="gambling" id="block-gambling" checked="@(Model.BlockedCategories?.Contains("gambling") ?? true)">
                             <label class="form-check-label" for="block-gambling">Gambling</label>
                         </div>
+                        <small class="form-text text-muted mt-2 d-block">
+                            <em>Note: These categories work alongside your filter level keywords for comprehensive protection.</em>
+                        </small>
                     </div>
 
                     <div class="mb-3">
@@ -87,6 +128,9 @@
                         btn.disabled = true;
                         btn.querySelector('.btn-text').classList.add('d-none');
                         btn.querySelector('.spinner-border').classList.remove('d-none');
+                        
+                        // Form will submit normally - don't prevent default
+                        // The spinner will show until page redirects
                     });
                 </script>
             </div>

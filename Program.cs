@@ -8,9 +8,10 @@ namespace PocketFence_AI;
 /// </summary>
 public class Program
 {
-    private static readonly SimpleAI _ai = new SimpleAI();
+    private static readonly Dashboard.SettingsManager _settingsManager = new Dashboard.SettingsManager();
+    private static readonly SimpleAI _ai = new SimpleAI(_settingsManager);
     private static readonly Dashboard.BlockedContentStore _blockedStore = Dashboard.DashboardService.BlockedContent;
-    private static readonly ContentFilter _filter = new ContentFilter(_blockedStore);
+    private static readonly ContentFilter _filter = new ContentFilter(_blockedStore, _settingsManager);
     private static readonly RealTimeFilterService _realTimeFilter = new RealTimeFilterService(_filter, _ai, _blockedStore);
     
     public static async Task Main(string[] args)
@@ -177,9 +178,12 @@ public class SimpleAI
     private readonly Dictionary<string, double> _threatKeywords;
     private readonly Dictionary<string, double> _safePatterns;
     private int _processedCount = 0;
+    private readonly Dashboard.SettingsManager? _settingsManager;
     
-    public SimpleAI()
+    public SimpleAI(Dashboard.SettingsManager? settingsManager = null)
     {
+        _settingsManager = settingsManager;
+        
         _threatKeywords = new Dictionary<string, double>
         {
             // High-risk keywords
@@ -247,6 +251,14 @@ public class SimpleAI
     
     public async Task<ContentAnalysis> AnalyzeContentAsync(string content)
     {
+        // Get filter level for threshold adjustment
+        string filterLevel = "moderate";
+        if (_settingsManager != null)
+        {
+            var settings = await _settingsManager.LoadSettingsAsync();
+            filterLevel = settings.FilterLevel;
+        }
+        
         var threatLevel = await AnalyzeThreatLevelAsync(content);
         var flags = new List<string>();
         var category = "General";
@@ -270,8 +282,23 @@ public class SimpleAI
             flags.Add("Malicious");
         }
         
-        var recommendation = threatLevel > 0.7 ? "BLOCK" : 
-                           threatLevel > 0.4 ? "MONITOR" : "ALLOW";
+        // Adjust thresholds based on filter level
+        double blockThreshold = filterLevel switch
+        {
+            "strict" => 0.5,   // More sensitive - block at lower threat scores
+            "relaxed" => 0.85, // Less sensitive - only block high threats
+            _ => 0.7           // moderate - balanced
+        };
+        
+        double monitorThreshold = filterLevel switch
+        {
+            "strict" => 0.3,
+            "relaxed" => 0.6,
+            _ => 0.4
+        };
+        
+        var recommendation = threatLevel > blockThreshold ? "BLOCK" : 
+                           threatLevel > monitorThreshold ? "MONITOR" : "ALLOW";
         
         return new ContentAnalysis
         {
@@ -294,17 +321,22 @@ public class ContentFilter
     private int _totalRequests = 0;
     private int _blockedRequests = 0;
     private readonly Dashboard.BlockedContentStore? _blockedStore;
+    private readonly Dashboard.SettingsManager? _settingsManager;
+    private string _currentFilterLevel = "moderate";
     
-    public ContentFilter(Dashboard.BlockedContentStore? blockedStore = null)
+    public ContentFilter(Dashboard.BlockedContentStore? blockedStore = null, Dashboard.SettingsManager? settingsManager = null)
     {
         _blockedStore = blockedStore;
+        _settingsManager = settingsManager;
         
+        // Default domains (always blocked regardless of level)
         _blockedDomains = new HashSet<string>
         {
             "malicious.com", "phishing.net", "adult-content.com",
             "gambling.org", "illegal-downloads.net"
         };
         
+        // Default keywords (moderate level)
         _blockedKeywords = new List<string>
         {
             "adult", "gambling", "drugs", "weapons", "violence",
@@ -319,8 +351,44 @@ public class ContentFilter
         return Task.CompletedTask;
     }
     
-    public Task<FilterResult> CheckUrlAsync(string url)
+    /// <summary>
+    /// Get blocked keywords based on filter level
+    /// </summary>
+    private List<string> GetKeywordsForLevel(string level)
     {
+        return level.ToLower() switch
+        {
+            "strict" => new List<string>
+            {
+                // Strict: Block everything including educational references
+                "adult", "gambling", "casino", "poker", "bet", "drugs", "marijuana", "cannabis",
+                "weapons", "gun", "violence", "blood", "gore", "malware", "phishing", 
+                "illegal", "torrent", "pirate", "crack", "hack", "porn", "xxx", "explicit",
+                "hate", "racist", "extremist", "suicide", "self-harm"
+            },
+            "relaxed" => new List<string>
+            {
+                // Relaxed: Only block explicit content and illegal activities
+                "adult", "porn", "xxx", "explicit", "malware", "phishing", "illegal"
+            },
+            _ => new List<string> // moderate (default)
+            {
+                // Moderate: Balanced approach
+                "adult", "gambling", "drugs", "weapons", "violence",
+                "malware", "phishing", "illegal", "torrent", "porn", "xxx"
+            }
+        };
+    }
+    
+    public async Task<FilterResult> CheckUrlAsync(string url)
+    {
+        // Load current filter level from settings
+        if (_settingsManager != null)
+        {
+            var settings = await _settingsManager.LoadSettingsAsync();
+            _currentFilterLevel = settings.FilterLevel;
+        }
+        
         _totalRequests++;
         
         var urlLower = url.ToLowerInvariant();
@@ -339,11 +407,12 @@ public class ContentFilter
             // Auto-save to dashboard store
             _blockedStore?.AddBlock(url, result.Reason);
             
-            return Task.FromResult(result);
+            return result;
         }
         
-        // Check blocked keywords
-        foreach (var keyword in _blockedKeywords)
+        // Check blocked keywords (level-specific)
+        var levelKeywords = GetKeywordsForLevel(_currentFilterLevel);
+        foreach (var keyword in levelKeywords)
         {
             if (urlLower.Contains(keyword))
             {
@@ -351,21 +420,21 @@ public class ContentFilter
                 var result = new FilterResult
                 {
                     IsBlocked = true,
-                    Reason = $"Contains blocked keyword '{keyword}'"
+                    Reason = $"Contains blocked keyword '{keyword}' (Filter: {_currentFilterLevel})"
                 };
                 
                 // Auto-save to dashboard store
                 _blockedStore?.AddBlock(url, result.Reason);
                 
-                return Task.FromResult(result);
+                return result;
             }
         }
         
-        return Task.FromResult(new FilterResult
+        return new FilterResult
         {
             IsBlocked = false,
             Reason = "No blocking rules matched"
-        });
+        };
     }
     
     private string ExtractDomain(string url)

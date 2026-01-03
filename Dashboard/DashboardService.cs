@@ -10,6 +10,7 @@ public static class DashboardService
     public static BlockedContentStore BlockedContent { get; } = new BlockedContentStore();
     public static OptimizedLoginRateLimiter RateLimiter { get; } = new OptimizedLoginRateLimiter(maxAttempts: 5, lockoutMinutes: 15);
     public static OptimizedSecurityAuditLogger AuditLogger { get; } = new OptimizedSecurityAuditLogger();
+    public static SettingsManager Settings { get; } = new SettingsManager();
 
     public static void ConfigureDashboard(WebApplicationBuilder builder)
     {
@@ -17,6 +18,7 @@ public static class DashboardService
         builder.Services.AddSingleton(BlockedContent);
         builder.Services.AddSingleton(RateLimiter);
         builder.Services.AddSingleton(AuditLogger);
+        builder.Services.AddSingleton(Settings);
 
         // Add Razor Pages services with custom root path
         builder.Services.AddRazorPages()

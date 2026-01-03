@@ -1,0 +1,12 @@
+{
+  "FilterLevel": "relaxed",
+  "NotificationEmail": "your-email@gmail.com",
+  "BlockedCategories": [
+    "adult",
+    "violence",
+    "hate",
+    "drugs",
+    "gambling"
+  ],
+  "CustomBlocklist": []
+}

@@ -1,0 +1,359 @@
+@page
+@model AccountModel
+@{
+    ViewData["Title"] = "Account Settings";
+}
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4"><i class="bi bi-person-circle"></i> Account Settings</h2>
+
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @Model.ErrorMessage
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @Model.SuccessMessage
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <div class="row">
+                <!-- Profile Information -->
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="bi bi-person"></i> Profile Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" asp-page-handler="UpdateProfile">
+                                @Html.AntiForgeryToken()
+                                
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Current Username</label>
+                                    <input type="text" class="form-control" value="@Model.CurrentUsername" readonly>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="newUsername" class="form-label fw-semibold">New Username</label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="newUsername" 
+                                           name="newUsername" 
+                                           minlength="3"
+                                           maxlength="50"
+                                           placeholder="Enter new username">
+                                    <div class="form-text">Leave blank to keep current username</div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-circle"></i> Update Username
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Change Password -->
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="bi bi-lock"></i> Change Password</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" asp-page-handler="ChangePassword">
+                                @Html.AntiForgeryToken()
+                                
+                                <div class="mb-3">
+                                    <label for="currentPassword" class="form-label fw-semibold">Current Password</label>
+                                    <input type="password" 
+                                           class="form-control" 
+                                           id="currentPassword" 
+                                           name="currentPassword" 
+                                           required
+                                           autocomplete="current-password">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="newPassword" class="form-label fw-semibold">New Password</label>
+                                    <input type="password" 
+                                           class="form-control" 
+                                           id="newPassword" 
+                                           name="newPassword" 
+                                           required
+                                           minlength="8"
+                                           autocomplete="new-password">
+                                    <div class="form-text">At least 8 characters</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="confirmNewPassword" class="form-label fw-semibold">Confirm New Password</label>
+                                    <input type="password" 
+                                           class="form-control" 
+                                           id="confirmNewPassword" 
+                                           name="confirmNewPassword" 
+                                           required
+                                           minlength="8"
+                                           autocomplete="new-password">
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-shield-lock"></i> Change Password
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email Settings -->
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="bi bi-envelope"></i> Email Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" asp-page-handler="UpdateEmail">
+                                @Html.AntiForgeryToken()
+                                
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Current Email</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" value="@Model.CurrentEmail" readonly>
+                                        @if (Model.EmailVerified)
+                                        {
+                                            <span class="input-group-text bg-success text-white">
+                                                <i class="bi bi-check-circle"></i> Verified
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="input-group-text bg-warning text-dark">
+                                                <i class="bi bi-exclamation-triangle"></i> Not Verified
+                                            </span>
+                                        }
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="newEmail" class="form-label fw-semibold">New Email Address</label>
+                                    <input type="email" 
+                                           class="form-control" 
+                                           id="newEmail" 
+                                           name="newEmail" 
+                                           placeholder="newemail@example.com">
+                                    <div class="form-text">A verification email will be sent to the new address</div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-envelope-check"></i> Update Email
+                                </button>
+
+                                @if (!Model.EmailVerified)
+                                {
+                                    <button type="submit" class="btn btn-outline-primary ms-2" formaction="?handler=ResendVerification">
+                                        <i class="bi bi-arrow-repeat"></i> Resend Verification
+                                    </button>
+                                }
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phone Settings -->
+                <!-- Phone verification disabled - email-only verification required
+                     To re-enable: uncomment this section and add phone check back to Login.cshtml.cs
+                     Configure SMS provider in DashboardService.cs (Twilio recommended) -->
+                <!--
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="bi bi-phone"></i> Phone Number</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" asp-page-handler="UpdatePhone">
+                                @Html.AntiForgeryToken()
+                                
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Current Phone</label>
+                                    <div class="input-group">
+                                        <input type="text" 
+                                               class="form-control" 
+                                               value="@(string.IsNullOrEmpty(Model.CurrentPhone) ? "Not set" : Model.CurrentPhone)" 
+                                               readonly>
+                                        @if (!string.IsNullOrEmpty(Model.CurrentPhone))
+                                        {
+                                            @if (Model.PhoneVerified)
+                                            {
+                                                <span class="input-group-text bg-success text-white">
+                                                    <i class="bi bi-check-circle"></i> Verified
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="input-group-text bg-warning text-dark">
+                                                    <i class="bi bi-exclamation-triangle"></i> Not Verified
+                                                </span>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="newPhone" class="form-label fw-semibold">Phone Number</label>
+                                    <div class="input-group">
+                                        <select class="form-select" id="phoneCountryCode" name="phoneCountryCode" style="max-width: 150px;">
+                                            <option value="+1" selected>🇺🇸 +1 (US)</option>
+                                            <option value="+1">🇨🇦 +1 (CA)</option>
+                                            <option value="+44">🇬🇧 +44 (UK)</option>
+                                            <option value="+61">🇦🇺 +61 (AU)</option>
+                                            <option value="+49">🇩🇪 +49 (DE)</option>
+                                            <option value="+33">🇫🇷 +33 (FR)</option>
+                                            <option value="+39">🇮🇹 +39 (IT)</option>
+                                            <option value="+34">🇪🇸 +34 (ES)</option>
+                                            <option value="+81">🇯🇵 +81 (JP)</option>
+                                            <option value="+86">🇨🇳 +86 (CN)</option>
+                                            <option value="+82">🇰🇷 +82 (KR)</option>
+                                            <option value="+91">🇮🇳 +91 (IN)</option>
+                                            <option value="+52">🇲🇽 +52 (MX)</option>
+                                            <option value="+55">🇧🇷 +55 (BR)</option>
+                                            <option value="+7">🇷🇺 +7 (RU)</option>
+                                            <option value="+27">🇿🇦 +27 (ZA)</option>
+                                            <option value="+64">🇳🇿 +64 (NZ)</option>
+                                            <option value="+31">🇳🇱 +31 (NL)</option>
+                                            <option value="+46">🇸🇪 +46 (SE)</option>
+                                            <option value="+47">🇳🇴 +47 (NO)</option>
+                                            <option value="+45">🇩🇰 +45 (DK)</option>
+                                            <option value="+358">🇫🇮 +358 (FI)</option>
+                                            <option value="+41">🇨🇭 +41 (CH)</option>
+                                            <option value="+43">🇦🇹 +43 (AT)</option>
+                                            <option value="+32">🇧🇪 +32 (BE)</option>
+                                            <option value="+351">🇵🇹 +351 (PT)</option>
+                                            <option value="+30">🇬🇷 +30 (GR)</option>
+                                            <option value="+48">🇵🇱 +48 (PL)</option>
+                                            <option value="+420">🇨🇿 +420 (CZ)</option>
+                                            <option value="+36">🇭🇺 +36 (HU)</option>
+                                            <option value="+353">🇮🇪 +353 (IE)</option>
+                                            <option value="+972">🇮🇱 +972 (IL)</option>
+                                            <option value="+971">🇦🇪 +971 (AE)</option>
+                                            <option value="+966">🇸🇦 +966 (SA)</option>
+                                            <option value="+65">🇸🇬 +65 (SG)</option>
+                                            <option value="+60">🇲🇾 +60 (MY)</option>
+                                            <option value="+63">🇵🇭 +63 (PH)</option>
+                                            <option value="+66">🇹🇭 +66 (TH)</option>
+                                            <option value="+84">🇻🇳 +84 (VN)</option>
+                                            <option value="+62">🇮🇩 +62 (ID)</option>
+                                        </select>
+                                        <input type="tel" 
+                                               class="form-control" 
+                                               id="newPhone" 
+                                               name="newPhone" 
+                                               placeholder="555-123-4567">
+                                    </div>
+                                    <div class="form-text">A verification code will be sent via SMS</div>
+                                </div>
+
+                                <!-- Carrier Selection (shows when phone entered) -->
+                                <div class="mb-3" id="accountCarrierSection" style="display: none;">
+                                    <label for="accountCarrier" class="form-label fw-semibold text-muted small">
+                                        <i class="bi bi-broadcast"></i> Mobile Carrier (for SMS)
+                                    </label>
+                                    <select class="form-select" id="accountCarrier" name="carrier">
+                                        <option value="">All carriers (may cause bounce emails)</option>
+                                        <option value="att">AT&T</option>
+                                        <option value="tmobile">T-Mobile</option>
+                                        <option value="verizon">Verizon</option>
+                                        <option value="sprint">Sprint</option>
+                                        <option value="boost">Boost Mobile</option>
+                                        <option value="cricket">Cricket Wireless</option>
+                                        <option value="uscellular">US Cellular</option>
+                                        <option value="virgin">Virgin Mobile</option>
+                                        <option value="metropcs">MetroPCS</option>
+                                    </select>
+                                    <div class="form-text">Select your carrier to avoid bounce emails</div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-telephone-check"></i> Update Phone
+                                </button>
+
+                                @if (!string.IsNullOrEmpty(Model.CurrentPhone) && !Model.PhoneVerified)
+                                {
+                                    <button type="submit" class="btn btn-outline-primary ms-2" formaction="?handler=ResendPhoneVerification">
+                                        <i class="bi bi-arrow-repeat"></i> Resend Code
+                                    </button>
+                                    <a href="/verify-phone?phoneNumber=@Model.CurrentPhone" class="btn btn-outline-success ms-2">
+                                        <i class="bi bi-shield-check"></i> Verify Now
+                                    </a>
+                                }
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                -->
+
+                <!-- Account Info -->
+                <div class="col-md-12 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0"><i class="bi bi-info-circle"></i> Account Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <p class="mb-2"><strong>Account Created:</strong></p>
+                                    <p class="text-muted">@Model.CreatedAt?.ToString("MMMM dd, yyyy")</p>
+                                </div>
+                                <div class="col-md-4">
+                                    <p class="mb-2"><strong>Last Login:</strong></p>
+                                    <p class="text-muted">@(Model.LastLogin?.ToString("MMMM dd, yyyy h:mm tt") ?? "Never")</p>
+                                </div>
+                                <div class="col-md-4">
+                                    <p class="mb-2"><strong>Account Role:</strong></p>
+                                    <p class="text-muted">@Model.Role</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Danger Zone -->
+                <div class="col-md-12">
+                    <div class="card shadow-sm border-danger">
+                        <div class="card-header bg-danger text-white">
+                            <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Danger Zone</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">Once you delete your account, there is no going back. Please be certain.</p>
+                            <form method="post" asp-page-handler="DeleteAccount" onsubmit="return confirm('⚠️ Are you absolutely sure you want to delete your account? This action cannot be undone!');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-outline-danger">
+                                    <i class="bi bi-trash"></i> Delete Account
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // Phone verification JavaScript disabled - uncomment if re-enabling phone verification
+    /*
+    document.getElementById('newPhone').addEventListener('input', function() {
+        const carrierSection = document.getElementById('accountCarrierSection');
+        if (this.value.trim().length > 0) {
+            carrierSection.style.display = 'block';
+        } else {
+            carrierSection.style.display = 'none';
+        }
+    });
+    */
+</script>

@@ -37,6 +37,15 @@
                         <p class="text-muted">Parent Dashboard Login</p>
                     </div>
 
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                            @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
                     @if (!string.IsNullOrEmpty(Model.ErrorMessage))
                     {
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -78,6 +87,13 @@
                         <button type="submit" class="btn btn-primary w-100" id="loginBtn">
                             <span class="btn-text">Login</span>
                             <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                        </button>
+
+                        <div class="text-center mt-3">
+                            <a href="/ForgotPassword" class="text-decoration-none d-block mb-2">Forgot your password?</a>
+                            <span class="text-muted">Don't have an account? </span>
+                            <a href="/register" class="text-decoration-none">Create one</a>
+                        </div>
                     </form>
                     
                     <script>

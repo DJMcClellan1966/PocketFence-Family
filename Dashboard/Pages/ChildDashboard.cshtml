@@ -1,0 +1,142 @@
+@page
+@model ChildDashboardModel
+@{
+    ViewData["Title"] = "My Activity";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - PocketFence</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar-custom {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .stat-badge {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .blocked-item {
+            padding: 1rem;
+            border-left: 4px solid #dc3545;
+            background: #f8d7da;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+        .safe-badge {
+            background: #d1e7dd;
+            border-left-color: #198754;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-custom mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-shield-check text-primary"></i>
+                <strong>PocketFence</strong>
+            </a>
+            <div class="d-flex align-items-center">
+                <span class="me-3">👋 Hi, @Model.Username!</span>
+                <a href="/logout" class="btn btn-outline-danger btn-sm">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Welcome Section -->
+        <div class="content-card text-center">
+            <h2>🛡️ Your Online Safety Dashboard</h2>
+            <p class="text-muted">PocketFence is keeping you safe online!</p>
+        </div>
+
+        <!-- Statistics -->
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <div class="content-card text-center">
+                    <div class="stat-badge">@Model.BlockedToday</div>
+                    <p class="mb-0">Blocked Today</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="content-card text-center">
+                    <div class="stat-badge">@Model.BlockedThisWeek</div>
+                    <p class="mb-0">Blocked This Week</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="content-card text-center">
+                    <div class="stat-badge">@Model.BlockedAllTime</div>
+                    <p class="mb-0">Total Blocked</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="content-card">
+            <h4><i class="bi bi-clock-history"></i> Recent Activity</h4>
+            <hr>
+            
+            @if (Model.RecentBlocks.Any())
+            {
+                @foreach (var block in Model.RecentBlocks)
+                {
+                    <div class="blocked-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong><i class="bi bi-shield-x text-danger"></i> Blocked Content</strong>
+                                <p class="mb-1 mt-2"><small class="text-muted">@block.Time.ToString("MMM dd, yyyy h:mm tt")</small></p>
+                                <p class="mb-0"><strong>Reason:</strong> @block.Reason</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="alert alert-success safe-badge">
+                    <i class="bi bi-check-circle"></i>
+                    <strong>Great job!</strong> No harmful content detected recently. Keep browsing safely!
+                </div>
+            }
+        </div>
+
+        <!-- Safety Tips -->
+        <div class="content-card">
+            <h4><i class="bi bi-lightbulb"></i> Internet Safety Tips</h4>
+            <hr>
+            <ul class="list-unstyled">
+                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Never share personal information with strangers online</li>
+                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Always ask a parent before downloading anything</li>
+                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Tell a trusted adult if something online makes you uncomfortable</li>
+                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Use strong passwords and keep them private</li>
+                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Be kind and respectful to others online</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -8,19 +8,19 @@ public class LoginModel : PageModel
 {
     private readonly OptimizedLoginRateLimiter _rateLimiter;
     private readonly OptimizedSecurityAuditLogger _auditLogger;
-
-    // Pre-hashed password for "PocketFence2026!" 
-    // Generated using: PasswordHasher.HashPassword("PocketFence2026!")
-    // In production, store this in a secure configuration or database
-    private const string HashedAdminPassword = "vZ5xGRhZQE1KqXC7KqXC7KqXC7KqXC7KqXC7KqXC7KqXC7KqXC7KqXC7Kw=="; // Placeholder, will be generated on first run
+    private readonly UserManager _userManager;
 
     public string? ErrorMessage { get; set; }
     public string? ReturnUrl { get; set; }
 
-    public LoginModel(OptimizedLoginRateLimiter rateLimiter, OptimizedSecurityAuditLogger auditLogger)
+    public LoginModel(
+        OptimizedLoginRateLimiter rateLimiter, 
+        OptimizedSecurityAuditLogger auditLogger,
+        UserManager userManager)
     {
         _rateLimiter = rateLimiter;
         _auditLogger = auditLogger;
+        _userManager = userManager;
     }
 
     public void OnGet(string? returnUrl)
@@ -82,17 +82,36 @@ public class LoginModel : PageModel
             return Page();
         }
 
-        // Verify credentials with password hashing
-        if (username == "admin" && VerifyAdminPassword(password))
+        // Authenticate user with UserManager
+        var (success, message, user) = await _userManager.AuthenticateAsync(username, password);
+
+        if (success && user != null)
         {
+            // Check if email is verified
+            if (!user.EmailVerified)
+            {
+                ErrorMessage = "⚠️ Please verify your email address before logging in. Check your inbox for the verification link.";
+                await _auditLogger.LogFailedLoginAsync(username, ipAddress, "Email not verified");
+                _rateLimiter.RecordFailedAttempt(identifier);
+                return Page();
+            }
+            
             // Successful login - reset rate limiter
             _rateLimiter.ResetAttempts(identifier);
             
             HttpContext.Session.SetString("IsAuthenticated", "true");
-            HttpContext.Session.SetString("Username", username);
+            HttpContext.Session.SetString("Username", user.Username);
+            HttpContext.Session.SetString("UserId", user.Id);
+            HttpContext.Session.SetString("Role", user.Role);
             HttpContext.Session.SetString("LastActivity", DateTime.UtcNow.ToString("o"));
             
-            await _auditLogger.LogSuccessfulLoginAsync(username, ipAddress);
+            await _auditLogger.LogSuccessfulLoginAsync(user.Username, ipAddress);
+            
+            // Redirect based on role
+            if (user.Role == "Child")
+            {
+                return Redirect("/ChildDashboard");
+            }
             
             return Redirect(ReturnUrl);
         }
@@ -113,28 +132,5 @@ public class LoginModel : PageModel
         await _auditLogger.LogFailedLoginAsync(username, ipAddress, "Invalid credentials");
         
         return Page();
-    }
-
-    private bool VerifyAdminPassword(string password)
-    {
-        // Generate hash on first run for setup
-        #if DEBUG
-        if (HashedAdminPassword.StartsWith("vZ5x")) // Placeholder hash detected
-        {
-            var correctHash = PasswordHasher.HashPassword("PocketFence2026!");
-            Console.WriteLine($"🔐 Generated password hash for production:");
-            Console.WriteLine($"   {correctHash}");
-            Console.WriteLine("   Replace HashedAdminPassword constant with this value!");
-            
-            // Allow login in DEBUG mode only
-            return password == "PocketFence2026!";
-        }
-        #endif
-
-        // Production: Always use hashed password verification
-        // For now, accept the correct password and verify against a proper hash
-        // TODO: Replace this with actual stored hash from configuration
-        var tempHash = PasswordHasher.HashPassword("PocketFence2026!");
-        return PasswordHasher.VerifyPassword(password, tempHash);
     }
 }

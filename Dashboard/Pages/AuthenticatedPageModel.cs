@@ -11,6 +11,7 @@ namespace PocketFence_AI.Dashboard.Pages;
 public class AuthenticatedPageModel : PageModel
 {
     public string Username { get; set; } = "Parent";
+    public string Role { get; set; } = "Parent";
     
     public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
     {
@@ -25,8 +26,17 @@ public class AuthenticatedPageModel : PageModel
             return;
         }
 
-        // Load username from session
+        // Load username and role from session
         Username = HttpContext.Session.GetString("Username") ?? "Parent";
+        Role = HttpContext.Session.GetString("Role") ?? "Parent";
+        
+        // Redirect children to child dashboard if they try to access parent pages
+        var currentPage = HttpContext.Request.Path.Value?.ToLower() ?? "";
+        if (Role == "Child" && !currentPage.Contains("/childdashboard"))
+        {
+            context.Result = Redirect("/ChildDashboard");
+            return;
+        }
         
         // Update last activity timestamp for session timeout tracking
         HttpContext.Session.SetString("LastActivity", DateTime.UtcNow.ToString("o"));

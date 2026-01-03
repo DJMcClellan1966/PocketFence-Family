@@ -6,14 +6,14 @@ namespace PocketFence_AI.Dashboard;
 
 public static class DashboardService
 {
-    // Singleton instances for data storage and security
+    // Singleton instances for data storage and security (GPT4All-optimized)
     public static BlockedContentStore BlockedContent { get; } = new BlockedContentStore();
-    public static LoginRateLimiter RateLimiter { get; } = new LoginRateLimiter(maxAttempts: 5, lockoutMinutes: 15);
-    public static SecurityAuditLogger AuditLogger { get; } = new SecurityAuditLogger();
+    public static OptimizedLoginRateLimiter RateLimiter { get; } = new OptimizedLoginRateLimiter(maxAttempts: 5, lockoutMinutes: 15);
+    public static OptimizedSecurityAuditLogger AuditLogger { get; } = new OptimizedSecurityAuditLogger();
 
     public static void ConfigureDashboard(WebApplicationBuilder builder)
     {
-        // Register singleton services
+        // Register singleton services (optimized versions)
         builder.Services.AddSingleton(BlockedContent);
         builder.Services.AddSingleton(RateLimiter);
         builder.Services.AddSingleton(AuditLogger);

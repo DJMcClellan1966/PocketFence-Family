@@ -6,8 +6,8 @@ namespace PocketFence_AI.Dashboard.Pages;
 
 public class LoginModel : PageModel
 {
-    private readonly LoginRateLimiter _rateLimiter;
-    private readonly SecurityAuditLogger _auditLogger;
+    private readonly OptimizedLoginRateLimiter _rateLimiter;
+    private readonly OptimizedSecurityAuditLogger _auditLogger;
 
     // Pre-hashed password for "PocketFence2026!" 
     // Generated using: PasswordHasher.HashPassword("PocketFence2026!")
@@ -17,7 +17,7 @@ public class LoginModel : PageModel
     public string? ErrorMessage { get; set; }
     public string? ReturnUrl { get; set; }
 
-    public LoginModel(LoginRateLimiter rateLimiter, SecurityAuditLogger auditLogger)
+    public LoginModel(OptimizedLoginRateLimiter rateLimiter, OptimizedSecurityAuditLogger auditLogger)
     {
         _rateLimiter = rateLimiter;
         _auditLogger = auditLogger;

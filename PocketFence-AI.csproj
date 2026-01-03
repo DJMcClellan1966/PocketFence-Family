@@ -26,4 +26,8 @@
     <RuntimeIdentifiers>win-x64;osx-x64;osx-arm64;linux-x64;linux-arm64</RuntimeIdentifiers>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+  </ItemGroup>
+
 </Project>

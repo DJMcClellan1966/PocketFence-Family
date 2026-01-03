@@ -1,17 +1,22 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using PocketFence_AI.Dashboard.Security;
 
 namespace PocketFence_AI.Dashboard;
 
 public static class DashboardService
 {
-    // Singleton instances for data storage
+    // Singleton instances for data storage and security
     public static BlockedContentStore BlockedContent { get; } = new BlockedContentStore();
+    public static LoginRateLimiter RateLimiter { get; } = new LoginRateLimiter(maxAttempts: 5, lockoutMinutes: 15);
+    public static SecurityAuditLogger AuditLogger { get; } = new SecurityAuditLogger();
 
     public static void ConfigureDashboard(WebApplicationBuilder builder)
     {
         // Register singleton services
         builder.Services.AddSingleton(BlockedContent);
+        builder.Services.AddSingleton(RateLimiter);
+        builder.Services.AddSingleton(AuditLogger);
 
         // Add Razor Pages services with custom root path
         builder.Services.AddRazorPages()
@@ -24,14 +29,47 @@ public static class DashboardService
         builder.Services.AddDistributedMemoryCache();
         builder.Services.AddSession(options =>
         {
-            options.IdleTimeout = TimeSpan.FromHours(24);
-            options.Cookie.HttpOnly = true;
-            options.Cookie.IsEssential = true;
+            options.IdleTimeout = TimeSpan.FromMinutes(30); // Session expires after 30 minutes of inactivity
+            options.Cookie.HttpOnly = true; // Prevents JavaScript access to cookie
+            options.Cookie.IsEssential = true; // Required for GDPR compliance
+            options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; // HTTPS when available
+            options.Cookie.SameSite = SameSiteMode.Strict; // Prevents CSRF attacks
         });
     }
 
     public static void UseDashboard(WebApplication app)
     {
+        // Security Headers Middleware
+        app.Use(async (context, next) =>
+        {
+            // Content Security Policy
+            context.Response.Headers.Append("Content-Security-Policy", 
+                "default-src 'self'; " +
+                "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
+                "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
+                "font-src 'self' https://cdn.jsdelivr.net; " +
+                "img-src 'self' data:; " +
+                "connect-src 'self';");
+            
+            // Prevent clickjacking
+            context.Response.Headers.Append("X-Frame-Options", "DENY");
+            
+            // Prevent MIME type sniffing
+            context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+            
+            // Enable XSS protection
+            context.Response.Headers.Append("X-XSS-Protection", "1; mode=block");
+            
+            // Referrer policy
+            context.Response.Headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
+            
+            // Permissions policy
+            context.Response.Headers.Append("Permissions-Policy", 
+                "geolocation=(), microphone=(), camera=()");
+            
+            await next();
+        });
+        
         // Serve static files (CSS, JS, images)
         app.UseStaticFiles();
 
@@ -84,7 +122,7 @@ public static class DashboardService
         }
 
         Console.WriteLine("🛡️  PocketFence Dashboard started at http://localhost:5000");
-        Console.WriteLine("📝 Login with: admin / admin");
+        Console.WriteLine("📝 Login with: admin / PocketFence2026!");
         Console.WriteLine($"📁 Static files: {app.Environment.WebRootPath}");
         Console.WriteLine($"📊 Blocked content: {BlockedContent.GetBlockedAllTime()} total");
         

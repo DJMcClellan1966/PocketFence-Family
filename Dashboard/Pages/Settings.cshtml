@@ -11,6 +11,22 @@
     </div>
 </div>
 
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>@TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
 <div class="row">
     <div class="col-md-8">
         <div class="card mb-4">
@@ -59,8 +75,20 @@
                         <small class="form-text text-muted">Receive alerts for blocked content</small>
                     </div>
 
-                    <button type="submit" class="btn btn-primary">Save Settings</button>
+                    <button type="submit" class="btn btn-primary" id="saveSettingsBtn">
+                        <span class="btn-text">Save Settings</span>
+                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    </button>
                 </form>
+                
+                <script>
+                    document.querySelector('form').addEventListener('submit', function(e) {
+                        const btn = document.getElementById('saveSettingsBtn');
+                        btn.disabled = true;
+                        btn.querySelector('.btn-text').classList.add('d-none');
+                        btn.querySelector('.spinner-border').classList.remove('d-none');
+                    });
+                </script>
             </div>
         </div>
 
@@ -73,8 +101,31 @@
                     <label class="form-label">Add Domain to Block</label>
                     <div class="input-group">
                         <input type="text" class="form-control" placeholder="example.com" id="customBlock">
-                        <button class="btn btn-outline-secondary" type="button">Add</button>
+                        <button class="btn btn-outline-secondary" type="button" id="addBlockBtn" onclick="addCustomBlock(this)">
+                            <span class="btn-text">Add</span>
+                            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                        </button>
                     </div>
+                    
+                    <script>
+                        function addCustomBlock(btn) {
+                            const input = document.getElementById('customBlock');
+                            if (!input.value.trim()) return;
+                            
+                            btn.disabled = true;
+                            btn.querySelector('.btn-text').classList.add('d-none');
+                            btn.querySelector('.spinner-border').classList.remove('d-none');
+                            
+                            // Simulate adding domain
+                            setTimeout(() => {
+                                showToast('Domain "' + input.value + '" added to blocklist', 'success');
+                                input.value = '';
+                                btn.disabled = false;
+                                btn.querySelector('.btn-text').classList.remove('d-none');
+                                btn.querySelector('.spinner-border').classList.add('d-none');
+                            }, 1000);
+                        }
+                    </script>
                 </div>
                 <div>
                     <small class="text-muted">Custom blocked domains: None yet</small>

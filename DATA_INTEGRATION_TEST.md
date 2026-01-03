@@ -29,7 +29,7 @@
 ### 1. View Dashboard (already running)
 ```
 http://localhost:5000
-Login: admin/admin
+Login: admin/PocketFence2026!
 ```
 
 You should see:
@@ -67,6 +67,9 @@ Location: `FamilyData/blocked_content.json`
 - ✅ Category auto-detection
 - ✅ Time-based filtering (today/week/month)
 - ✅ Complete blocked history
+- ✅ **NEW: ContentFilter auto-saves all blocks to dashboard**
+- ✅ **NEW: Real-time monitoring service with `monitor start/stop` commands**
+- ✅ **NEW: All filtering operations automatically appear in dashboard**
 
 ## Next Steps (Optional)
 1. ✅ **Delete seed data:** Deleted `FamilyData/blocked_content.json` to start fresh

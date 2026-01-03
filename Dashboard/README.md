@@ -103,7 +103,7 @@ private void LoadSampleData()
 ## 🔒 Security Notes
 
 ### For MVP (Week 1-2)
-- ✅ Simple hardcoded login (admin/admin)
+- ✅ Simple hardcoded login (admin/PocketFence2026!)
 - ✅ Session-based authentication
 - ✅ HttpOnly cookies
 - ⚠️ **NOT production-ready!**

@@ -9,8 +9,9 @@ namespace PocketFence_AI;
 public class Program
 {
     private static readonly SimpleAI _ai = new SimpleAI();
-    private static readonly ContentFilter _filter = new ContentFilter();
     private static readonly Dashboard.BlockedContentStore _blockedStore = Dashboard.DashboardService.BlockedContent;
+    private static readonly ContentFilter _filter = new ContentFilter(_blockedStore);
+    private static readonly RealTimeFilterService _realTimeFilter = new RealTimeFilterService(_filter, _ai, _blockedStore);
     
     public static async Task Main(string[] args)
     {
@@ -74,6 +75,15 @@ public class Program
                 case "stats":
                     ShowStats();
                     break;
+                case "monitor start":
+                    _realTimeFilter.StartMonitoring();
+                    break;
+                case "monitor stop":
+                    _realTimeFilter.StopMonitoring();
+                    break;
+                case "monitor status":
+                    Console.WriteLine($"Real-time monitoring: {(_realTimeFilter.IsMonitoring ? "🟢 ACTIVE" : "🔴 STOPPED")}");
+                    break;
                 case "dashboard":
                     Console.WriteLine("🛡️  Starting dashboard...");
                     Console.WriteLine("Run: dotnet run dashboard");
@@ -95,6 +105,9 @@ public class Program
         Console.WriteLine("  check <url>      - Check if URL should be blocked");
         Console.WriteLine("  analyze <text>   - Analyze text content for safety");
         Console.WriteLine("  stats            - Show filtering statistics");
+        Console.WriteLine("  monitor start    - Start real-time traffic monitoring");
+        Console.WriteLine("  monitor stop     - Stop real-time traffic monitoring");
+        Console.WriteLine("  monitor status   - Check monitoring status");
         Console.WriteLine("  dashboard        - Instructions to start web dashboard");
         Console.WriteLine("  clear            - Clear screen");
         Console.WriteLine("  help             - Show this help");
@@ -120,13 +133,7 @@ public class Program
         if (result.IsBlocked || aiScore > 0.7)
         {
             Console.WriteLine($"   ⚠️  Recommendation: {(result.IsBlocked ? "Block" : "Monitor")}");
-            
-            // Save to blocked content store if blocked
-            if (result.IsBlocked)
-            {
-                _blockedStore.AddBlock(url, result.Reason);
-                Console.WriteLine($"   📝 Saved to blocked content log");
-            }
+            Console.WriteLine($"   📊 Saved to dashboard (view at http://localhost:5000/Blocked)");
         }
     }
     
@@ -286,9 +293,12 @@ public class ContentFilter
     private readonly List<string> _blockedKeywords;
     private int _totalRequests = 0;
     private int _blockedRequests = 0;
+    private readonly Dashboard.BlockedContentStore? _blockedStore;
     
-    public ContentFilter()
+    public ContentFilter(Dashboard.BlockedContentStore? blockedStore = null)
     {
+        _blockedStore = blockedStore;
+        
         _blockedDomains = new HashSet<string>
         {
             "malicious.com", "phishing.net", "adult-content.com",
@@ -320,11 +330,16 @@ public class ContentFilter
         if (_blockedDomains.Contains(domain))
         {
             _blockedRequests++;
-            return Task.FromResult(new FilterResult
+            var result = new FilterResult
             {
                 IsBlocked = true,
                 Reason = $"Domain '{domain}' is in blocklist"
-            });
+            };
+            
+            // Auto-save to dashboard store
+            _blockedStore?.AddBlock(url, result.Reason);
+            
+            return Task.FromResult(result);
         }
         
         // Check blocked keywords
@@ -333,11 +348,16 @@ public class ContentFilter
             if (urlLower.Contains(keyword))
             {
                 _blockedRequests++;
-                return Task.FromResult(new FilterResult
+                var result = new FilterResult
                 {
                     IsBlocked = true,
                     Reason = $"Contains blocked keyword '{keyword}'"
-                });
+                };
+                
+                // Auto-save to dashboard store
+                _blockedStore?.AddBlock(url, result.Reason);
+                
+                return Task.FromResult(result);
             }
         }
         

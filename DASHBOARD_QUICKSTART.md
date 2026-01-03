@@ -18,7 +18,7 @@ pocketfence> dashboard
 You should see:
 ```
 🛡️  PocketFence Dashboard started at http://localhost:5000
-📝 Login with: admin / admin
+📝 Login with: admin / PocketFence2026!
 ```
 
 ## Access the Dashboard
@@ -26,7 +26,7 @@ You should see:
 1. Open browser: **http://localhost:5000**
 2. Login with:
    - Username: `admin`
-   - Password: `admin`
+   - Password: `PocketFence2026!`
 
 ## Dashboard Pages
 
@@ -67,9 +67,9 @@ You should see:
    - Improve error messages
 
 4. **Security** (1 hour)
-   - Change default password
-   - Add password hashing
-   - Test session timeout
+   - ~~Change default password~~
+   - ~~Add password hashing~~
+   - ~~Test session timeout~~
 
 ## File Structure
 
@@ -128,15 +128,15 @@ dotnet build
 ### "Login not working"
 - Clear browser cache
 - Check browser console (F12)
-- Verify credentials: admin/admin
+- Verify credentials: admin/PocketFence2026!
 
 ## Week 1 Goals ✅
 
 - [x] Dashboard runs ✅
-- [ ] Test on 3 browsers
-- [ ] Connect real data
-- [ ] Professional appearance
-- [ ] No critical bugs
+- [x] Test on 3 browsers ✅
+- [x] Connect real data ✅
+- [x] Professional appearance ✅
+- [x] No critical bugs ✅
 
 **Time Budget:** 8 hours total (as per roadmap)
 

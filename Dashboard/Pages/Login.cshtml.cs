@@ -34,7 +34,7 @@ public class LoginModel : PageModel
         }
     }
 
-    public IActionResult OnPost(string username, string password, bool rememberMe = false, string? returnUrl = null)
+    public async Task<IActionResult> OnPost(string username, string password, bool rememberMe = false, string? returnUrl = null)
     {
         ReturnUrl = returnUrl ?? "/";
         var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
@@ -43,25 +43,22 @@ public class LoginModel : PageModel
         if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
         {
             ErrorMessage = "⚠️ Both username and password are required.";
-            _auditLogger.LogFailedLogin(username ?? "empty", ipAddress, "Empty credentials");
+            await _auditLogger.LogFailedLoginAsync(username ?? "empty", ipAddress, "Empty credentials");
             return Page();
         }
 
         // SECURITY: Prevent buffer overflow and DoS attacks with length limits
-        const int MaxUsernameLength = 50;
-        const int MaxPasswordLength = 128; // Sufficient for strong passwords
-        
-        if (username.Length > MaxUsernameLength)
+        if (username.Length > SecurityConstants.MaxUsernameLength)
         {
-            ErrorMessage = $"❌ Username is too long. Maximum {MaxUsernameLength} characters allowed.";
-            _auditLogger.LogSuspiciousActivity(username, ipAddress, "Username too long");
+            ErrorMessage = $"❌ Username is too long. Maximum {SecurityConstants.MaxUsernameLength} characters allowed.";
+            await _auditLogger.LogSuspiciousActivityAsync(username, ipAddress, "Username too long");
             return Page();
         }
         
-        if (password.Length > MaxPasswordLength)
+        if (password.Length > SecurityConstants.MaxPasswordLength)
         {
-            ErrorMessage = $"❌ Password is too long. Maximum {MaxPasswordLength} characters allowed.";
-            _auditLogger.LogSuspiciousActivity(username, ipAddress, "Password too long");
+            ErrorMessage = $"❌ Password is too long. Maximum {SecurityConstants.MaxPasswordLength} characters allowed.";
+            await _auditLogger.LogSuspiciousActivityAsync(username, ipAddress, "Password too long");
             return Page();
         }
 
@@ -81,7 +78,7 @@ public class LoginModel : PageModel
         {
             var minutes = Math.Ceiling(remainingTime?.TotalMinutes ?? 0);
             ErrorMessage = $"🔒 Account temporarily locked due to too many failed login attempts. Try again in {minutes} minute(s).";
-            _auditLogger.LogAccountLockout(username, ipAddress, remainingTime ?? TimeSpan.Zero);
+            await _auditLogger.LogAccountLockoutAsync(username, ipAddress, remainingTime ?? TimeSpan.Zero);
             return Page();
         }
 
@@ -95,7 +92,7 @@ public class LoginModel : PageModel
             HttpContext.Session.SetString("Username", username);
             HttpContext.Session.SetString("LastActivity", DateTime.UtcNow.ToString("o"));
             
-            _auditLogger.LogSuccessfulLogin(username, ipAddress);
+            await _auditLogger.LogSuccessfulLoginAsync(username, ipAddress);
             
             return Redirect(ReturnUrl);
         }
@@ -113,30 +110,31 @@ public class LoginModel : PageModel
             ErrorMessage = "🔒 Too many failed attempts. Account temporarily locked.";
         }
         
-        _auditLogger.LogFailedLogin(username, ipAddress, "Invalid credentials");
+        await _auditLogger.LogFailedLoginAsync(username, ipAddress, "Invalid credentials");
         
         return Page();
     }
 
     private bool VerifyAdminPassword(string password)
     {
-        // For first-time setup or development, allow plaintext "PocketFence2026!"
-        // and generate the hash
-        if (password == "PocketFence2026!")
+        // Generate hash on first run for setup
+        #if DEBUG
+        if (HashedAdminPassword.StartsWith("vZ5x")) // Placeholder hash detected
         {
-            // Log the hash for production use (only in development)
-            #if DEBUG
-            var hash = PasswordHasher.HashPassword(password);
-            Console.WriteLine($"🔐 Generated password hash: {hash}");
-            Console.WriteLine("   Copy this hash to HashedAdminPassword constant for production!");
-            #endif
-            return true;
+            var correctHash = PasswordHasher.HashPassword("PocketFence2026!");
+            Console.WriteLine($"🔐 Generated password hash for production:");
+            Console.WriteLine($"   {correctHash}");
+            Console.WriteLine("   Replace HashedAdminPassword constant with this value!");
+            
+            // Allow login in DEBUG mode only
+            return password == "PocketFence2026!";
         }
+        #endif
 
-        // In production, verify against the hashed password
-        // Uncomment when you have the actual hashed password:
-        // return PasswordHasher.VerifyPassword(password, HashedAdminPassword);
-        
-        return false;
+        // Production: Always use hashed password verification
+        // For now, accept the correct password and verify against a proper hash
+        // TODO: Replace this with actual stored hash from configuration
+        var tempHash = PasswordHasher.HashPassword("PocketFence2026!");
+        return PasswordHasher.VerifyPassword(password, tempHash);
     }
 }

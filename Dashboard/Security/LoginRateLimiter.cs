@@ -12,7 +12,10 @@ public class LoginRateLimiter
     private readonly TimeSpan _lockoutDuration;
     private readonly TimeSpan _attemptWindow;
 
-    public LoginRateLimiter(int maxAttempts = 5, int lockoutMinutes = 15, int attemptWindowMinutes = 5)
+    public LoginRateLimiter(
+        int maxAttempts = SecurityConstants.RateLimitMaxAttempts, 
+        int lockoutMinutes = SecurityConstants.RateLimitLockoutMinutes, 
+        int attemptWindowMinutes = SecurityConstants.RateLimitAttemptWindowMinutes)
     {
         _maxAttempts = maxAttempts;
         _lockoutDuration = TimeSpan.FromMinutes(lockoutMinutes);

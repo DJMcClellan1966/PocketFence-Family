@@ -29,7 +29,7 @@ public static class DashboardService
         builder.Services.AddDistributedMemoryCache();
         builder.Services.AddSession(options =>
         {
-            options.IdleTimeout = TimeSpan.FromMinutes(30); // Session expires after 30 minutes of inactivity
+            options.IdleTimeout = TimeSpan.FromMinutes(SecurityConstants.SessionTimeoutMinutes);
             options.Cookie.HttpOnly = true; // Prevents JavaScript access to cookie
             options.Cookie.IsEssential = true; // Required for GDPR compliance
             options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; // HTTPS when available
@@ -121,10 +121,25 @@ public static class DashboardService
             SeedData.AddSampleBlocks(BlockedContent);
         }
 
+        // Start background cleanup task for rate limiter
+        var cleanupTimer = new System.Threading.Timer(
+            callback: _ => 
+            {
+                RateLimiter.Cleanup();
+                #if DEBUG
+                Console.WriteLine($"🧹 Rate limiter cleanup completed at {DateTime.Now:HH:mm:ss}");
+                #endif
+            },
+            state: null,
+            dueTime: TimeSpan.FromMinutes(SecurityConstants.RateLimitCleanupIntervalMinutes),
+            period: TimeSpan.FromMinutes(SecurityConstants.RateLimitCleanupIntervalMinutes)
+        );
+
         Console.WriteLine("🛡️  PocketFence Dashboard started at http://localhost:5000");
         Console.WriteLine("📝 Login with: admin / PocketFence2026!");
         Console.WriteLine($"📁 Static files: {app.Environment.WebRootPath}");
         Console.WriteLine($"📊 Blocked content: {BlockedContent.GetBlockedAllTime()} total");
+        Console.WriteLine($"🧹 Rate limiter cleanup task started (runs every {SecurityConstants.RateLimitCleanupIntervalMinutes} minutes)");
         
         app.Run();
     }

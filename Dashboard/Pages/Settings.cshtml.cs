@@ -3,29 +3,21 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace PocketFence_AI.Dashboard.Pages;
 
-public class SettingsModel : PageModel
+public class SettingsModel : AuthenticatedPageModel
 {
     public string NotificationEmail { get; set; } = "";
 
-    public IActionResult OnGet()
+    public void OnGet()
     {
-        if (HttpContext.Session.GetString("IsAuthenticated") != "true")
-        {
-            return Redirect("/login");
-        }
+        // Authentication handled by AuthenticatedPageModel base class
 
         // TODO: Load settings from config file
         NotificationEmail = "parent@example.com";
-
-        return Page();
     }
 
     public IActionResult OnPost(string filterLevel, string notificationEmail)
     {
-        if (HttpContext.Session.GetString("IsAuthenticated") != "true")
-        {
-            return Redirect("/login");
-        }
+        // Authentication handled by AuthenticatedPageModel base class
 
         // Validate email if provided
         if (!string.IsNullOrWhiteSpace(notificationEmail))

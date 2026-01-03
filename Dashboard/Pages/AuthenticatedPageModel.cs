@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Filters;
+using PocketFence_AI.Dashboard.Security;
 
 namespace PocketFence_AI.Dashboard.Pages;
 
@@ -45,7 +46,7 @@ public class AuthenticatedPageModel : PageModel
         }
 
         var lastActivity = DateTime.Parse(lastActivityStr);
-        var sessionTimeout = TimeSpan.FromMinutes(30); // Match DashboardService configuration
+        var sessionTimeout = TimeSpan.FromMinutes(SecurityConstants.SessionTimeoutMinutes);
         var elapsed = DateTime.UtcNow - lastActivity;
         var remaining = sessionTimeout - elapsed;
 

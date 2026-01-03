@@ -8,9 +8,6 @@ namespace PocketFence_AI.Dashboard.Security;
 /// </summary>
 public static class PasswordHasher
 {
-    private const int SaltSize = 16; // 128 bits
-    private const int KeySize = 32; // 256 bits
-    private const int Iterations = 100000; // OWASP recommended minimum
     private static readonly HashAlgorithmName Algorithm = HashAlgorithmName.SHA256;
 
     /// <summary>
@@ -21,21 +18,21 @@ public static class PasswordHasher
     public static string HashPassword(string password)
     {
         // Generate random salt
-        byte[] salt = RandomNumberGenerator.GetBytes(SaltSize);
+        byte[] salt = RandomNumberGenerator.GetBytes(SecurityConstants.PasswordSaltSize);
 
         // Hash the password
         byte[] hash = Rfc2898DeriveBytes.Pbkdf2(
             password,
             salt,
-            Iterations,
+            SecurityConstants.PasswordHashIterations,
             Algorithm,
-            KeySize
+            SecurityConstants.PasswordKeySize
         );
 
         // Combine salt and hash: salt + hash
-        byte[] hashBytes = new byte[SaltSize + KeySize];
-        Array.Copy(salt, 0, hashBytes, 0, SaltSize);
-        Array.Copy(hash, 0, hashBytes, SaltSize, KeySize);
+        byte[] hashBytes = new byte[SecurityConstants.PasswordSaltSize + SecurityConstants.PasswordKeySize];
+        Array.Copy(salt, 0, hashBytes, 0, SecurityConstants.PasswordSaltSize);
+        Array.Copy(hash, 0, hashBytes, SecurityConstants.PasswordSaltSize, SecurityConstants.PasswordKeySize);
 
         // Return as Base64 string
         return Convert.ToBase64String(hashBytes);
@@ -54,21 +51,21 @@ public static class PasswordHasher
             // Decode the Base64 hash
             byte[] hashBytes = Convert.FromBase64String(hashedPassword);
 
-            // Extract the salt (first 16 bytes)
-            byte[] salt = new byte[SaltSize];
-            Array.Copy(hashBytes, 0, salt, 0, SaltSize);
+            // Extract the salt (first bytes)
+            byte[] salt = new byte[SecurityConstants.PasswordSaltSize];
+            Array.Copy(hashBytes, 0, salt, 0, SecurityConstants.PasswordSaltSize);
 
             // Extract the hash (remaining bytes)
-            byte[] storedHash = new byte[KeySize];
-            Array.Copy(hashBytes, SaltSize, storedHash, 0, KeySize);
+            byte[] storedHash = new byte[SecurityConstants.PasswordKeySize];
+            Array.Copy(hashBytes, SecurityConstants.PasswordSaltSize, storedHash, 0, SecurityConstants.PasswordKeySize);
 
             // Hash the input password with the same salt
             byte[] computedHash = Rfc2898DeriveBytes.Pbkdf2(
                 password,
                 salt,
-                Iterations,
+                SecurityConstants.PasswordHashIterations,
                 Algorithm,
-                KeySize
+                SecurityConstants.PasswordKeySize
             );
 
             // Compare the hashes using constant-time comparison

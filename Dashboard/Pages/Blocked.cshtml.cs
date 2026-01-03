@@ -4,7 +4,7 @@ using System.Text;
 
 namespace PocketFence_AI.Dashboard.Pages;
 
-public class BlockedModel : PageModel
+public class BlockedModel : AuthenticatedPageModel
 {
     private readonly BlockedContentStore _blockedContent;
 
@@ -20,12 +20,9 @@ public class BlockedModel : PageModel
     public List<string> AvailableCategories { get; set; } = new();
     public int TotalCount { get; set; } = 0;
 
-    public IActionResult OnGet(string? search, string? category, string? dateRange)
+    public void OnGet(string? search, string? category, string? dateRange)
     {
-        if (HttpContext.Session.GetString("IsAuthenticated") != "true")
-        {
-            return Redirect("/login");
-        }
+        // Authentication handled by AuthenticatedPageModel base class
 
         SearchQuery = search ?? "";
         CategoryFilter = category ?? "";
@@ -74,8 +71,6 @@ public class BlockedModel : PageModel
         }
 
         BlockedItems = allBlocks;
-
-        return Page();
     }
 
     public int GetCategoryCount(string category)
@@ -86,10 +81,7 @@ public class BlockedModel : PageModel
 
     public IActionResult OnGetExport()
     {
-        if (HttpContext.Session.GetString("IsAuthenticated") != "true")
-        {
-            return Redirect("/login");
-        }
+        // Authentication handled by AuthenticatedPageModel base class
 
         var items = _blockedContent.GetAll();
         var csv = GenerateCsv(items, "all");
@@ -99,10 +91,7 @@ public class BlockedModel : PageModel
 
     public IActionResult OnGetExportFiltered(string? search, string? category, string? dateRange)
     {
-        if (HttpContext.Session.GetString("IsAuthenticated") != "true")
-        {
-            return Redirect("/login");
-        }
+        // Authentication handled by AuthenticatedPageModel base class
 
         // Apply same filtering logic as OnGet
         var items = _blockedContent.GetAll();

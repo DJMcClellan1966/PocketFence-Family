@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace PocketFence_AI.Dashboard.Pages;
 
-public class IndexModel : PageModel
+public class IndexModel : AuthenticatedPageModel
 {
     private readonly BlockedContentStore _blockedContent;
 
@@ -12,7 +12,6 @@ public class IndexModel : PageModel
         _blockedContent = blockedContent;
     }
 
-    public string Username { get; set; } = "Parent";
     public int BlockedToday { get; set; }
     public int BlockedThisWeek { get; set; }
     public int BlockedThisMonth { get; set; }
@@ -20,20 +19,13 @@ public class IndexModel : PageModel
     public List<BlockedItem> RecentBlocks { get; set; } = new();
     public Dictionary<string, int> BlocksByCategory { get; set; } = new();
 
-    public IActionResult OnGet()
+    public void OnGet()
     {
-        // Check authentication
-        if (HttpContext.Session.GetString("IsAuthenticated") != "true")
-        {
-            return Redirect("/login");
-        }
-
-        Username = HttpContext.Session.GetString("Username") ?? "Parent";
+        // Authentication handled by AuthenticatedPageModel base class
+        // Username already loaded from base class
 
         // Load real data from BlockedContentStore
         LoadRealData();
-
-        return Page();
     }
 
     private void LoadRealData()

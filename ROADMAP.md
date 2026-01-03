@@ -1,8 +1,11 @@
 # PocketFence-Family Development Roadmap
 
-**Project Vision:** Local content filtering system for families with parent monitoring dashboard and child protection features, optimized for local AI inference without external dependencies.
+**Project Vision:** AI-powered parental control hub that leverages native OS restrictions (iOS Screen Time, Google Family Link, Microsoft Family Safety) with centralized parent monitoring, optimized for local AI inference.
+
+**Architecture Pivot:** Changed from proxy server approach to native OS API integration for simpler, more reliable device control.
 
 **Current Version:** v0.1.0 (Phase 0 Complete)  
+**Current Phase:** Phase 1 - OS API Integration (Starting)  
 **Last Updated:** January 3, 2026
 
 ---
@@ -84,140 +87,202 @@
 
 ---
 
-## 🎯 PHASE 1: ACTIVE FILTERING - **STARTING NOW**
+## 🎯 PHASE 1: OS API INTEGRATION - **STARTING NOW**
 
-**Goal:** Transform from monitoring dashboard to active content filter  
-**Timeline:** January 6-12, 2026 (Week 1)  
-**Priority:** **CRITICAL** - This makes the app actually work
+**Goal:** Control child devices via native OS parental control APIs instead of proxy  
+**Timeline:** January 6-27, 2026 (3 weeks)  
+**Priority:** **CRITICAL** - Simpler, more reliable than proxy approach
 
-### Implementation Plan
+**Architecture Decision:** Leverage iOS Screen Time, Google Family Link, and Microsoft Family Safety APIs. Our AI decides restrictions, OS enforces them.
 
-#### Day 1-2: HTTP Proxy Server Foundation
-- [ ] Create ProxyServer.cs class
-- [ ] Add HTTP proxy listener (port 8080)
-- [ ] Request/response interception pipeline
-- [ ] Basic pass-through (no filtering yet)
-- [ ] Request logging to console
-- [ ] Test with HTTP sites (curl, browser proxy settings)
+### Why This Approach is Better
+- ✅ **OS enforces** - child can't bypass without parent password
+- ✅ **System-level control** - blocks apps, games, browsers, everything
+- ✅ **No proxy setup** - just link devices via existing OS features
+- ✅ **Works offline** - rules cached on device by OS
+- ✅ **More reliable** - Apple/Google/Microsoft maintain the APIs
+- ✅ **Simpler code** - REST API calls vs network proxying
 
-**Technical Details:**
-- Use HttpListener or Titanium.Web.Proxy
-- Parse HTTP requests (method, URL, headers, body)
-- Forward to destination server
-- Capture response
-- Log to BlockedContentStore
+### Week 1: Foundation & iOS Screen Time API
 
-#### Day 3-4: Content Filtering Integration
-- [ ] Integrate SimpleAI into proxy request handler
-- [ ] Check URL against ContentFilter blocklist
-- [ ] Analyze response content for threats
-- [ ] Return blocked page HTML for bad requests
-- [ ] Dashboard shows live filtering activity
-- [ ] Per-user filtering (track by session/device)
+**Status:** ⬜ Not Started
 
-**Filtering Logic:**
-```
-Request → Extract URL
-       ↓
-    ContentFilter.IsBlocked(url)?
-       ↓ YES
-    Return BlockPage.html
-       ↓ NO
-    Forward to destination
-       ↓
-    Response ← Get content
-       ↓
-    SimpleAI.AnalyzeContent()?
-       ↓ THREAT
-    Return BlockPage.html
-       ↓ SAFE
-    Return response to client
-```
+#### Day 1-2: Research & Architecture
+- [ ] Research iOS Screen Time API (Apple Family Sharing)
+- [ ] Research Google Family Link API
+- [ ] Research Microsoft Family Safety API
+- [ ] Design unified abstraction layer (IDeviceControlProvider)
+- [ ] Create ChildDevice model with OS-specific fields
+- [ ] Plan authentication flows for each platform
 
-#### Day 5: HTTPS Support (SSL/TLS Interception)
-- [ ] Generate self-signed root certificate
-- [ ] Store certificate in Data folder
-- [ ] Certificate installation script/guide for:
-  - Windows (certmgr.msc)
-  - macOS (Keychain Access)
-  - iOS (Settings → Profile)
-  - Android (Settings → Security)
-- [ ] SSL/TLS termination in proxy
-- [ ] Re-encrypt connection to destination
-- [ ] Handle certificate validation
-- [ ] Test HTTPS sites (facebook.com, youtube.com, etc.)
+#### Day 3-5: iOS Screen Time Integration
+- [ ] Create iOSScreenTimeProvider.cs
+- [ ] Implement Apple ID authentication (OAuth)
+- [ ] Device linking flow (parent authorizes via Apple Family)
+- [ ] API client for Screen Time restrictions:
+  - Website blocking
+  - App limits by category
+  - Downtime schedules
+  - Communication limits
+- [ ] Test with real iPhone/iPad
+- [ ] Error handling (auth failures, network issues)
 
-**Cert Setup:**
-```powershell
-# Generate root CA
-New-SelfSignedCertificate -Type Custom -Subject "CN=PocketFence Root CA" ...
+**iOS API Capabilities:**
+- Block websites by domain or category
+- Restrict apps by age rating or specific apps
+- Set downtime (device unusable during hours)
+- Limit screen time per day/app
+- Always allow certain apps (educational)
+- Communication limits (who can contact)
 
-# Export for import on child devices
-Export-Certificate -Cert $cert -FilePath PocketFenceCA.cer
-```
+#### Day 6-7: Dashboard Integration
+- [ ] /Devices/LinkiOS page (authorization flow)
+- [ ] Display linked iOS devices in dashboard
+- [ ] Show current restrictions per device
+- [ ] Update restriction settings UI
+- [ ] Push changes to iOS devices via API
+- [ ] Pull activity reports from Screen Time API
+- [ ] Display in parent dashboard
 
-#### Day 6-7: Testing, Polish & Documentation
-- [ ] Test with child device (phone, tablet)
-- [ ] Verify blocked content logs to dashboard
-- [ ] Performance testing (latency impact)
-- [ ] Memory usage optimization
-- [ ] Error handling (connection failures, timeouts)
-- [ ] Blocked page design (user-friendly message)
-- [ ] Proxy setup guide:
-  - Windows proxy settings
-  - iOS WiFi proxy config
-  - Android WiFi proxy config
-  - Browser-specific proxy (Firefox, Chrome)
-- [ ] Troubleshooting common issues
-- [ ] Update README with proxy instructions
+### Week 2: Android & Windows Integration
 
-**Setup Example:**
-```
-Windows: Settings → Network → Proxy → Manual
-  Address: 192.168.1.114
-  Port: 8080
+**Status:** ⬜ Not Started
 
-iOS: Settings → WiFi → (i) → HTTP Proxy → Manual
-  Server: 192.168.1.114
-  Port: 8080
-```
+#### Day 8-10: Google Family Link Integration
+- [ ] Create AndroidFamilyLinkProvider.cs
+- [ ] Implement Google OAuth authentication
+- [ ] Device linking via Family Link
+- [ ] API client for Digital Wellbeing:
+  - App blocking by package name
+  - Screen time limits
+  - Bedtime schedules
+  - Location tracking
+  - Content ratings
+- [ ] Test with Android phone/tablet
+- [ ] Dashboard pages for Android devices
 
-### Success Criteria
-- ✅ Child device routes traffic through proxy
-- ✅ Blocked domains return block page
-- ✅ Threat content triggers AI blocking
-- ✅ Dashboard shows real-time filtering
-- ✅ HTTPS sites work with installed cert
-- ✅ < 50ms latency overhead
-- ✅ Handles 100+ req/min without issues
+**Android API Capabilities:**
+- Block specific apps by package name
+- Set daily screen time limits
+- Bedtime mode (device locks)
+- Location tracking and history
+- App activity monitoring
+- Content filtering by rating
+- YouTube supervised experience
 
-### Deliverables
-1. ProxyServer.cs - Core proxy implementation
-2. BlockPage.cshtml - User-facing block page
-3. Certificate generation script
-4. PROXY_SETUP.md - Setup guide
-5. Updated dashboard showing live proxy activity
+#### Day 11-14: Microsoft Family Safety Integration
+- [ ] Create WindowsFamilySafetyProvider.cs
+- [ ] Implement Microsoft Account OAuth
+- [ ] Device linking via Family Safety
+- [ ] API client for Windows restrictions:
+  - Web filtering
+  - App/game blocking by rating
+  - Screen time limits
+  - Activity reports
+- [ ] Test with Windows PC
+- [ ] Dashboard pages for Windows devices
 
----
+**Windows API Capabilities:**
+- Web content filtering (Safe Search, blocked sites)
+- App and game restrictions by rating (ESRB, PEGI)
+- Screen time limits per day
+- Activity reports (apps used, sites visited)
+- Location tracking
+- Purchase approvals for games/apps
 
-## 🚀 PHASE 2: DEVICE MANAGEMENT (Weeks 2-4)
+### Week 3: AI Rule Generation & Unified Dashboard
 
-**Goal:** Make it easy for parents to manage multiple children and devices  
-**Timeline:** January 13 - February 2, 2026
+**Status:** ⬜ Not Started
 
-### Week 2: Child Profiles & QR Pairing
+#### Day 15-17: AI-Driven Rule Sets
+- [ ] Age-based restriction templates:
+  - Toddler (0-5): Very restrictive
+  - Child (6-12): Educational focus
+  - Teen (13-17): Balanced restrictions
+- [ ] SimpleAI analyzes age and generates rules
+- [ ] Per-device customization (override AI defaults)
+- [ ] Rule preview before applying
+- [ ] Bulk rule updates across devices
+- [ ] Schedule-ENHANCED FEATURES & POLISH (Week 4-6)
 
-#### Child Device Model
-- [ ] ChildDevice.cs (Id, Name, Age, DeviceType, PairingToken, CreatedAt)
-- [ ] Device storage in JSON (devices.json)
-- [ ] DeviceManager.cs (CRUD operations)
-- [ ] Parent page: /Devices (list all devices)
-- [ ] Parent page: /Devices/Add (create new device profile)
+**Goal:** Advanced monitoring, educational content, and user experience polish  
+**Timeline:** January 27 - February 16, 2026  
+**Status:** ⬜ Not Started
 
-#### QR Code Generation
-- [ ] Add QRCoder NuGet package
-- [ ] Generate pairing token (GUID)
-- [ ] QR code contains: `http://192.168.1.114:5000/pair?token={guid}`
+### Week 4: Advanced Monitoring & Reports
+
+#### Enhanced Dashboard
+- [ ] Activity timeline with filtering (date, device, child)
+- [ ] Charts with Chart.js:
+  - Screen time trends over weeks
+  - Most used apps by device
+  - Blocked content by category
+  - Time-of-day usage heatmap
+- [ ] Weekly parent reports via email
+- [ ] Export functionality (CSV, PDF)
+- [ ] Device comparison view
+- [ ] Real-time notifications (child requests override)
+
+#### Smart Alerts
+- [ ] Email alerts for concerning activity
+- [ ] SMS alerts (optional, via Twilio)
+- [ ] Parent mobile app notifications (future)
+- [ ] Configurable alert thresholds
+- [ ] Daily digest email option
+
+### Week 5: Educational Content Portal
+
+#### Safe Learning Hub
+- [ ] Age-appropriate website directory (curated)
+- [ ] Educational games and apps database
+- [ ] STEM learning resources by grade level
+- [ ] Coding tutorials (Khan Academy, Code.org)
+- [ ] Safe video content (YouTube Kids curated)
+- [ ] Online library resources
+- [ ] Homework help sites whitelist
+
+#### Content Integration
+- [ ] Auto-whitelist educational content
+- [ ] "Always Allow" for specific learning apps
+- [ ] Educational app recommendations by age
+- [ ] Integration with Khan Academy API
+- [ ] YouTube Kids safe channel lists
+- [ ] Safe search enforcement helpers
+
+### Week 6: User Experience & Polish
+
+#### Parent UX Improvements
+- [ ] Onboarding wizard for first-time setup
+- [ ] Tooltips and help text throughout
+- [ ] Quick actions menu (common tasks)
+- [ ] Mobile-responsive improvements
+- [ ] Dark mode option
+- [ ] Keyboard shortcuts
+- [ ] Accessibility improvements (ARIA labels)
+
+#### Device Management Features
+- [ ] Device nicknames (rename devices)
+- [ ] Device groups (all kids, just teens, etc.)
+- [ ] Bulk rule changes across groups
+- [ ] Template rule sets (save/load)
+- [ ] Rule history (see past changes)
+- [ ] Rollback changes feature
+
+#### Testing & Documentation
+- [ ] User testing with real families
+- [ ] Fix bugs from testing feedback
+- [ ] Complete setup guides per platform
+- [ ] Video tutorials (screen recordings)
+- [ ] FAQ document
+- [ ] Troubleshooting guide
+- [ ] Privacy policy and terms
+
+**Deliverables:**
+- Advanced analytics dashboard
+- Educational content hub
+- Polished UX with onboarding
+- Complete documentation
+- Ready for family beta testingtp://192.168.1.114:5000/pair?token={guid}`
 - [ ] Display QR on /Devices/Add page
 - [ ] Child scans → redirects to device setup instructions
 - [ ] Device pairing endpoint validates token
@@ -263,82 +328,218 @@ iOS: Settings → WiFi → (i) → HTTP Proxy → Manual
 - [ ] Emergency override (parent password)
 - [ ] Weekly email reports (activity summary)
 - [ ] Mobile notifications via email
+Weeks 7-10)
 
-**Deliverables:**
-- Full device management system
-- QR code pairing working
-- Age-based rules active
-- Educational content available
-- Enhanced parent dashboard
+**Goal:** Robust system for 24/7 household use with multiple families  
+**Timeline:** February 17 - March 16, 2026  
+**Status:** ⬜ Not Started
 
----
-
-## 📈 PHASE 3: PRODUCTION READY (Months 2-3)
-
-**Goal:** Robust system for 24/7 household use  
-**Timeline:** February-March 2026
-
-### Multi-Device Support
-- [ ] Handle 10+ child devices simultaneously
-- [ ] Per-device bandwidth management
-- [ ] Performance optimization for multiple streams
-- [ ] Connection pooling
-- [ ] Request queuing and prioritization
-
-### Offline & Synchronization
-- [ ] Offline activity logging (child device caches)
-- [ ] Sync queue when connection restored
-- [ ] Local rule caching on child devices
-- [ ] Graceful degradation when parent offline
-- [ ] Conflict resolution for setting changes
-
-### Advanced Features
-- [ ] Multi-parent accounts (mom + dad both manage)
-- [ ] YouTube video title/channel filtering
-- [ ] Social media monitoring (TikTok, Instagram)
-- [ ] Image content analysis (basic NSFW detection)
-- [ ] App usage tracking (if visible in proxy)
-- [ ] Device location tracking (optional)
+### Multi-Family Support
+- [ ] Multiple parent accounts
+- [ ] Shared parenting (mom + dad co-manage)
+- [ ] Permission levels (admin parent, view-only parent)
+- [ ] Grandparent access (read-only)
+- [ ] Caregiver temporary access codes
 
 ### System Reliability
 - [ ] Auto-restart on crash (Windows Service)
-- [ ] Database backup/restore
-- [ ] Configuration export/import
-- [ ] Health monitoring endpoint
+- [ ] Health monitoring endpoint (/health)
 - [ ] Performance metrics logging
-- [ ] Memory leak detection and prevention
+- [ ] Memory leak detection
+- [ ] API rate limit handling (OS APIs)
+- [ ] Retry logic for failed API calls
+- [ ] Graceful degradation if APIs down
 
-### Production Deployment
-- [ ] Windows Service installation
-- [ ] Startup on boot
-- [ ] Logging to files (rolling logs)
-- [ ] Update mechanism (auto-update)
+### Data Management
+- [ ] Database backup/restore (JSON → SQLite migration)
+- [ ] Configuration export/import
+- [ ] Archive old activity logs (> 90 days)
+- [ ] Data retention policies
+- [ ] GDPR compliance (data export, deletion)
+- [ ] Secure credential storage (encrypted)
+
+### Deployment & Updates
+- [ ] Windows Service installation script
+- [ ] Startup on boot configuration
+- [ ] Logging to files (rolling logs, max 100MB)
+- [ ] Auto-update mechanism (check GitHub releases)
 - [ ] Uninstaller script
+- [ ] Configuration wizard (first-run)
+
+### Performance Optimization
+- [ ] API call caching (reduce OS API calls)
+- [ ] Database query optimization
+- [ ] Lazy loading for dashboard
+- [ ] Pagination for large activity logs
+- [ ] Background job queue (push updates)
+- [ ] Handle 20+ devices without slowdown
 
 **Deliverables:**
-- Rock-solid system running 30+ days
-- Handles 10,000+ requests/day
-- 99.9% uptime
-- Family uses daily with confidence
-
----
-
-## 🌟 PHASE 4: DISTRIBUTION (Month 4+) - **TBD**
+- Windows Service package
+- Auto-update system
+- 30+ days stable operation
+- Multi-family ready3+) - **TBD**
 
 **Goal:** Share with other families or publish commercially  
-**Timeline:** April 2026 onwards  
-**Decision:** Will be made after Phase 3 testing
+**Timeline:** March 2026 onwards  
+**Decision:** Will be made after Phase 3 beta testing  
+**Status:** ⬜ Not Started
 
-### Option A: Open Source Project
-- Polish documentation
-- One-click installer
-- Docker container
-- Setup wizard
-- Video tutorials
-- GitHub releases
-- Community support forum
+### Distribution Options Under Consideration
 
-### Option B: PWA Hosted Service (Progressive Web App)
+#### Option A: Open Source GitHub Project
+**Pros:** Free, community-driven, maximum reach  
+**Effort:** 2-3 weeks polish
+
+- [ ] Complete documentation (README, guides, FAQs)
+- [ ] One-click installer (PowerShell script)
+- [ ] Docker container option
+- [ ] Setup wizard (first-run experience)
+- [ ] Video tutorials (YouTube)
+- [ ] GitHub releases with changelogs
+- [ ] Community support (Discord or Discussions)
+- [ ] MIT or GPL license
+
+#### Option B: Hosted SaaS Service
+**Pros:** Easiest for users, recurring revenue  
+**Effort:** 2-3 months (cloud infrastructure)
+
+- [ ] Convert to cloud-hosted service
+- [ ] Multi-tenant database architecture
+- [ ] User account system (signup/billing)
+- [ ] Subscription tiers ($5-15/month)
+- [ ] Stripe payment integration
+- [ ] Azure/AWS deployment
+- [ ] Customer support system
+- [ ] Privacy policy / GDPR compliance
+ROJECT STATUS TRACKER
+
+**Current Phase:** Phase 1 - OS API Integration (Week 1, Day 1)  
+**Next Milestone:** iOS Screen Time API working (January 13, 2026)  
+**Team Size:** 1 (solo developer)  
+**Total Dev Time:** ~3 weeks  
+**Architecture:** Native OS API approach (no proxy)
+
+### ✅ Completed Milestones
+
+**Phase 0: Foundation (January 3, 2026)** ✅ COMPLETE
+- ✅ Authentication system (email verification, password reset)
+- ✅ Role-based access control (Parent/Child/Admin)
+- ✅ Dashboard UI (parent monitoring + child simplified view)
+- ✅ Local AI filtering engine (SimpleAI - keyword matching)
+- ✅ Network accessibility (0.0.0.0:5000)
+- ✅ Email/SMS infrastructure (Gmail SMTP, multiple SMS providers)
+- ✅ User management (create, update, delete accounts)
+- ✅ Security features (rate limiting, audit logging, session timeout)
+- ✅ Git repository with commits
+
+### 🔄 Current Sprint (Week 1: Jan 6-12, 2026)
+
+**Focus:** iOS Screen Time API Integration
+
+**Today (Day 1 - January 6):**
+- ⬜ Research Apple Screen Time API documentation
+- ⬜ Research authentication requirements (OAuth, Family Sharing)
+- ⬜ Design IDeviceControlProvider interface
+- ⬜ Create ChildDevice model
+- ⬜ Plan folder structure for device providers
+
+**This Week:**
+- ⬜ Day 1-2: Research & architecture design
+- ⬜ Day 3-5: Build iOS Screen Time provider
+- ⬜ Day 6-7: Dashboard integration for iOS devices
+JSON file storage (migrate to SQLite in Phase 3)
+- REST API clients for OS platforms
+
+**Frontend:**
+- Bootstrap 5
+- JavaScript (vanilla)
+- Chart.js (analytics graphs)
+- QRCoder (device linking - maybe not needed now)
+
+**OS API Integrations:**
+- iOS: Screen Time API via Apple Family Sharing
+- Android: Google Family Link / Digital Wellbeing API
+- Windows: Microsoft Family Safety API
+- OAuth 2.0 for authentication
+
+**AI/Filtering:**
+- SimpleAI (keyword + pattern matching)
+- Local inference only
+- No ML models (lightweight)
+- Generates age-appropriate rule sets
+
+**Communications:**
+- Gmail SMTP (parent notifications)
+- Twilio SMS (optional alerts)
+
+**NuGet Packages:**
+- Microsoft.AspNetCore.App
+- System.Text.Json
+- QRCoder (if needed for linking)
+- Chart.js (CDN)
+- Bootstrap 5 (CDN)
+
+**Future Considerations:**
+- SQLite for better performance (Phase 3)
+- SignalR for real-time dashboard updates
+- Background job queue (Hangfire or custom
+
+### 🎯 Phase Completion Status
+
+| Phase | Status | Start Date | End Date | Progress |
+|-------|--------|------------|----------|----------|
+| Phase 0: Foundation | ✅ Complete | Dec 2025 | Jan 3, 2026 | 100% |
+| Phase 1: OS APIs | 🔄 In Progress | Jan 6, 2026 | Jan 27, 2026 | 0% |
+| Phase 2: Features | ⏳ Planned | Jan 27, 2026 | Feb 16, 2026 | 0% |
+| Phase 3: Production | ⏳ Planned | Feb 17, 2026 | Mar 16, 2026 | 0% |
+| Phase 4: Distribution | ⏳ TBD | Mar 2026+ | TBD | 0% |
+
+### 📈 Weekly Progress Tracking
+
+**Week of January 6-12, 2026:**
+- [⬜] Day 1: API research complete
+- [⬜] Day 2: Architecture designed
+- [⬜] Day 3: iOS provider started
+- [⬜] Day 4: OAuth authentication working
+- [⬜] Day 5: First restriction successfully pushed
+- [⬜] Day 6: Dashboard shows linked iOS device
+- [⬜] Day 7: Week 1 demo ready
+
+**Update this section daily with completed tasks.**
+
+### 🚧 Known Issues & Blockers
+
+**Current Issues:**
+- None (fresh start on Phase 1)
+
+**Technical Debt from Phase 0:**
+- Settings.cshtml.cs null reference warning (low priority)
+- Phone verification code still in repo but commented out
+- JSON storage may need SQLite migration eventually
+
+**Risks:**
+- iOS/Android/Windows API availability (need to verify access)
+- OAuth complexity for each platform
+- API rate limits from OS providers
+- Testing requires real devices (iOS, Android, Windows)
+
+### 🎯 Success Metrics
+
+**Phase 1 Success Criteria:**
+- [ ] Successfully link at least one device per platform (iOS, Android, Windows)
+- [ ] Push restrictions from dashboard to device
+- [ ] Retrieve activity reports from OS APIs
+- [ ] Dashboard displays all devices in one view
+- [ ] Setup time < 5 minutes per device
+
+**Overall Project Success:**
+- [ ] Works with own family (3+ children, 5+ devices)
+- [ ] 30+ days continuous operation
+- [ ] Positive feedback from beta users
+- [ ] Less than 1 hour/week maintenance
+- [ ] Stable enough for public releas
+**Current Lean:** Option A (Open Source) for maximum reach, then add Option C (Store) for easy installs
 - Convert dashboard to PWA
 - Cloud parent account
 - Child PWA installs on any device

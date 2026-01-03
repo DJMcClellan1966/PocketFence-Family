@@ -88,7 +88,7 @@ namespace PocketFence_AI.Dashboard.Pages.OAuth
 
                 // Load user and update with Apple tokens
                 var userManager = new UserManager();
-                var pocketFenceUser = userManager.GetUserById(userId);
+                var pocketFenceUser = await userManager.GetUserByIdAsync(userId);
                 if (pocketFenceUser == null)
                 {
                     Success = false;
@@ -108,9 +108,9 @@ namespace PocketFence_AI.Dashboard.Pages.OAuth
                     IsPrivateEmail = userInfo?.IsPrivateEmail ?? false
                 };
 
-                // Store as JSON in a custom field (or create separate AppleAuth table in production)
-                pocketFenceUser.Notes = JsonSerializer.Serialize(appleAuthData);
-                userManager.UpdateUser(pocketFenceUser);
+                // Store as JSON in Metadata dictionary
+                pocketFenceUser.Metadata["AppleOAuth"] = JsonSerializer.Serialize(appleAuthData);
+                await userManager.SaveDatabaseInternalAsync(pocketFenceUser);
 
                 // Clear OAuth state from session
                 HttpContext.Session.Remove("AppleOAuthState");

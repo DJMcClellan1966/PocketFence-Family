@@ -98,6 +98,22 @@ public class UserManager
     }
 
     /// <summary>
+    /// Internal helper to save database after modifying a user
+    /// </summary>
+    public async Task SaveDatabaseInternalAsync(User user)
+    {
+        var database = await LoadDatabaseAsync().ConfigureAwait(false);
+        var existingUser = database.Users.FirstOrDefault(u => u.Id == user.Id);
+        if (existingUser != null)
+        {
+            // Update the user in the database
+            var index = database.Users.IndexOf(existingUser);
+            database.Users[index] = user;
+            await SaveDatabaseAsync(database).ConfigureAwait(false);
+        }
+    }
+
+    /// <summary>
     /// Create a new user account
     /// </summary>
     public async Task<(bool Success, string Message, User? User)> CreateUserAsync(

@@ -15,18 +15,18 @@ namespace PocketFence_AI.Dashboard.Pages.Devices
     {
         public bool IsAppleAuthenticated { get; set; } = false;
 
-        public void OnGet()
+        public async Task OnGetAsync()
         {
             // Check if user already authenticated with Apple
             var userId = HttpContext.Session.GetString("UserId");
             if (!string.IsNullOrEmpty(userId))
             {
                 var userManager = new UserManager();
-                var user = userManager.GetUserById(userId);
+                var user = await userManager.GetUserByIdAsync(userId);
                 
                 // Check if user has Apple OAuth tokens stored
-                // TODO: Check Notes field for Apple tokens (improve this in production)
-                IsAppleAuthenticated = !string.IsNullOrEmpty(user?.Notes) && user.Notes.Contains("AccessToken");
+                // TODO: Check Metadata field for Apple tokens (improve this in production)
+                IsAppleAuthenticated = user?.Metadata.ContainsKey("AppleOAuth") == true;
             }
         }
 

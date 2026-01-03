@@ -1,0 +1,125 @@
+@page
+@using PocketFence_AI.Dashboard
+@model PocketFence_AI.Dashboard.Pages.Devices.LinkiOSModel
+@{
+    ViewData["Title"] = "Link iOS Device";
+    Layout = "_Layout";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-phone-fill me-2"></i>
+                        Link iOS Device
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    @if (!Model.IsAppleAuthenticated)
+                    {
+                        <!-- Step 1: Authenticate with Apple -->
+                        <div class="mb-4">
+                            <h5>Step 1: Sign in with Apple</h5>
+                            <p class="text-muted">
+                                To manage your child's iOS device, we need permission to access Screen Time data through Apple Family Sharing.
+                            </p>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <strong>What you'll need:</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>Your Apple ID</li>
+                                <li>Family Sharing set up with your child</li>
+                                <li>Screen Time enabled on child's device</li>
+                            </ul>
+                        </div>
+
+                        <form method="post">
+                            <button type="submit" class="btn btn-dark btn-lg w-100" style="font-size: 1.1rem;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-apple me-2" viewBox="0 0 16 16">
+                                    <path d="M11.182.008C11.148-.03 9.923.023 8.857 1.18c-1.066 1.156-.902 2.482-.878 2.516.024.034 1.52.087 2.475-1.258.955-1.345.762-2.391.728-2.43zm3.314 11.733c-.048-.096-2.325-1.234-2.113-3.422.212-2.189 1.675-2.789 1.698-2.854.023-.065-.597-.79-1.254-1.157a3.692 3.692 0 0 0-1.563-.434c-.108-.003-.483-.095-1.254.116-.508.139-1.653.589-1.968.607-.316.018-1.256-.522-2.267-.665-.647-.125-1.333.131-1.824.328-.49.196-1.422.754-2.074 2.237-.652 1.482-.311 3.83-.067 4.56.244.729.625 1.924 1.273 2.796.576.984 1.34 1.667 1.659 1.899.319.232 1.219.386 1.843.067.502-.308 1.408-.485 1.766-.472.357.013 1.061.154 1.782.539.571.197 1.111.115 1.652-.105.541-.221 1.324-1.059 2.238-2.758.347-.79.505-1.217.473-1.282z"/>
+                                    <path d="M11.182.008C11.148-.03 9.923.023 8.857 1.18c-1.066 1.156-.902 2.482-.878 2.516.024.034 1.52.087 2.475-1.258.955-1.345.762-2.391.728-2.43zm3.314 11.733c-.048-.096-2.325-1.234-2.113-3.422.212-2.189 1.675-2.789 1.698-2.854.023-.065-.597-.79-1.254-1.157a3.692 3.692 0 0 0-1.563-.434c-.108-.003-.483-.095-1.254.116-.508.139-1.653.589-1.968.607-.316.018-1.256-.522-2.267-.665-.647-.125-1.333.131-1.824.328-.49.196-1.422.754-2.074 2.237-.652 1.482-.311 3.83-.067 4.56.244.729.625 1.924 1.273 2.796.576.984 1.34 1.667 1.659 1.899.319.232 1.219.386 1.843.067.502-.308 1.408-.485 1.766-.472.357.013 1.061.154 1.782.539.571.197 1.111.115 1.652-.105.541-.221 1.324-1.059 2.238-2.758.347-.79.505-1.217.473-1.282z"/>
+                                </svg>
+                                Sign in with Apple
+                            </button>
+                        </form>
+
+                        <div class="mt-4">
+                            <h6>Don't have Family Sharing set up?</h6>
+                            <p class="small text-muted">
+                                <a href="https://support.apple.com/en-us/HT201088" target="_blank" class="text-primary">Learn how to set up Family Sharing</a> on your Apple devices.
+                            </p>
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- Step 2: Select Child & Device -->
+                        <div class="mb-4">
+                            <div class="alert alert-success">
+                                <i class="bi bi-check-circle-fill me-2"></i>
+                                Connected to Apple Family Sharing
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h5>Step 2: Select Child & Device</h5>
+                            <p class="text-muted">Choose which child and device you want to monitor.</p>
+                        </div>
+
+                        <form method="post">
+                            <div class="mb-3">
+                                <label class="form-label">Child Name</label>
+                                <input type="text" name="childName" class="form-control" placeholder="e.g., Emma" required />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Child Age</label>
+                                <input type="number" name="childAge" class="form-control" placeholder="e.g., 10" min="1" max="17" required />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Device Nickname</label>
+                                <input type="text" name="deviceNickname" class="form-control" placeholder="e.g., Emma's iPhone" required />
+                                <div class="form-text">Give this device a friendly name</div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">Select Device from Family</label>
+                                <select name="appleDeviceId" class="form-select" required>
+                                    <option value="">Loading devices...</option>
+                                    <!-- TODO: Populate with actual devices from Apple Family API -->
+                                </select>
+                                <div class="form-text">Devices from your Apple Family Sharing group</div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
+                                <i class="bi bi-link-45deg me-2"></i>
+                                Link This Device
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+
+            <!-- Privacy Notice -->
+            <div class="card mt-4 border-0 bg-light">
+                <div class="card-body">
+                    <h6 class="text-muted">
+                        <i class="bi bi-shield-check me-2"></i>
+                        Privacy & Security
+                    </h6>
+                    <p class="small text-muted mb-0">
+                        Your Apple credentials are never stored by PocketFence. We only receive temporary access tokens to read Screen Time data. 
+                        You can revoke access at any time in your Apple ID settings.
+                    </p>
+                </div>
+            </div>
+
+            <div class="text-center mt-3">
+                <a href="/Devices" class="btn btn-link">← Back to Devices</a>
+            </div>
+        </div>
+    </div>
+</div>

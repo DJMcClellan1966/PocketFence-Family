@@ -1,53 +1,43 @@
-# 🤖 PocketFence AI - Local Content Filter
+# 🛡️ PocketFence-Family
 
 [![.NET](https://img.shields.io/badge/.NET-8.0-blue.svg)](https://dotnet.microsoft.com/download)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-**A lightweight local content filtering system optimized for local inference without external dependencies.**
+**One dashboard to manage all your kids' device restrictions. Works with iOS Screen Time, Android Family Link, and Microsoft Family Safety.**
 
-## 🌟 Overview
+---
 
-PocketFence AI is a local content filter designed to analyze URLs and text content for safety using a simple AI engine. Built for speed and efficiency, it runs entirely on your local machine with no external API dependencies.
+## 🎯 What It Does
 
+**Simple Concept:**  
+Your kids' devices already have parental controls built-in. PocketFence makes them easier to manage with AI-powered suggestions and a unified dashboard.
 
-## 🚀 Key Features
+**How It Works:**
+1. **Open PocketFence** on your PC or phone browser
+2. **Sign in** with your Apple/Google/Microsoft account
+3. **See all devices** from Family Sharing/Family Link in one place
+4. **Set restrictions** → PocketFence pushes to OS → **Device enforces**
+5. **Get reports** → Activity from all devices, all platforms
 
-- **Local AI Inference**: Lightweight threat analysis without external APIs
-- **Content Filtering**: URL and text content analysis
-- **Real-Time Analysis**: Fast threat level detection
-- **Privacy First**: All processing happens locally
-- **Simple CLI**: Easy-to-use command-line interface
-- **Extensible**: Simple architecture for customization
+**Why This Works:**
+- ✅ Uses built-in OS controls (Screen Time, Family Link, Family Safety)
+- ✅ OS enforces rules → Can't be bypassed or uninstalled
+- ✅ No network setup needed → No proxy, router config, or VPN
+- ✅ Works everywhere → Home, school, friends' houses
+- ✅ AI makes it smarter → Age-appropriate suggestions automatically
 
-## 📦 Installation & Setup
+---
+
+## 🚀 Quick Start
 
 ### Prerequisites
 - [.NET 8.0](https://dotnet.microsoft.com/download) or later
+- Windows 10+, macOS 11+, or Linux
 
-### Quick Start
+### Run the Dashboard
 ```powershell
-# Build the project
-dotnet build
-
-# Run PocketFence AI
-dotnet run
-```
-
-## 🎮 Usage
-
-### Interactive Commands
-
-```
-pocketfence> check https://example.com
-🔍 Analysis for: https://example.com
-   Filter Result: ✅ ALLOWED
-   AI Threat Score: 0.15/1.0
-   Reason: No blocking rules matched
-
-pocketfence> analyze "This is test content"
-🧠 AI Content Analysis:
-   Safety Score: 0.85/1.0
-   Category: General
+# Start PocketFence
+dotnet run dashboard
    Confidence: 0.45
    Recommendation: ALLOW
 
@@ -57,101 +47,91 @@ pocketfence> stats
    Blocked: 5 (20.0%)
    Allowed: 20 (80.0%)
    AI Processed: 25
+# Opens in browser automatically
+# Visit: http://localhost:5000 or http://192.168.1.114:5000
 
-pocketfence> help
-Available commands:
-  check <url>      - Check if URL should be blocked
-  analyze <text>   - Analyze text content for safety
-  stats            - Show filtering statistics
-  clear            - Clear screen
-  help             - Show this help
-  exit             - Exit program
+# Default login:
+# Username: admin
+# Password: PocketFence2026!
 ```
-
-## 🏗️ Architecture
-
-The system consists of three main components:
-
-### SimpleAI
-Lightweight AI engine for threat detection using keyword analysis and pattern matching.
-
-### ContentFilter
-URL-based filtering with domain blocklists and keyword detection.
-
-### Program (Main CLI)
-Interactive command-line interface for content analysis.
-
-## 🔧 Configuration
-
-Edit threat keywords and safe patterns in the `SimpleAI` class constructor or extend with your own ML models.
-- Emoji and sticker support
-- Parental oversight capabilities
-
-### 📁 **Family File Manager**
-- Secure file storage and sharing
-- Age-appropriate folder access
-- Content scanning for safety
-- Backup and recovery features
-
-### ⏰ **Screen Time Manager**
-- Automated time tracking
-- Educational time bonuses
-- Break reminders and healthy usage
-
-## 📈 Performance
-
-- **Lightweight**: Minimal resource usage
-- **Fast**: Quick analysis and filtering
-- **Offline**: No internet required for operation
-- **Cross-Platform**: Works on Windows, Linux, and macOS
-
-## 🛠️ Extending PocketFence AI
-
-### Adding Custom Filters
-
-Extend the `ContentFilter` class with your own filtering rules:
-
-```csharp
-public class ContentFilter
-{
-    // Add your custom domain blocklists
-    private readonly HashSet<string> _blockedDomains = new() 
-    {
-        "malicious.com", "phishing.net", "your-custom-domain.com"
-    };
-    
-    // Add your custom keyword filters
-    private readonly List<string> _blockedKeywords = new()
-    {
-        "adult", "gambling", "your-custom-keyword"
-    };
-}
-```
-
-### Integrating ML Models
-
-Replace the `SimpleAI` keyword-based analysis with your own ML model:
-
-```csharp
-public class SimpleAI
-{
-    public async Task<double> AnalyzeThreatLevelAsync(string content)
-    {
-        // Replace with your ML model inference
-        // Example: TensorFlow, ONNX, or GPT4All integration
-        return await YourMLModel.PredictThreatLevel(content);
-    }
-}
-```
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-Built for privacy-conscious users who want local content filtering without external dependencies.
 
 ---
 
-**PocketFence AI** - Local content filtering made simple. 🤖✨
+## 📱 Platform Support
+
+### iOS (Screen Time)
+- Block websites by domain
+- App limits by bundle ID
+- Downtime scheduling
+- Communication controls
+- **Status:** OAuth integration in progress
+
+### Android (Family Link)
+- Block apps by package name
+- Daily screen time limits
+- Bedtime mode
+- Location tracking
+- **Status:** Coming Week 2
+
+### Windows (Family Safety)
+- Web content filtering
+- App/game restrictions by rating
+- Screen time limits
+- Activity reports
+- **Status:** Coming Week 3
+
+---
+
+## 🤖 AI Features
+
+**SimpleAI Engine:**
+- Analyzes threat levels locally (no cloud)
+- Suggests age-appropriate restrictions
+- Learns from parent preferences
+- Generates smart block lists
+
+**Age-Based Templates:**
+- Toddler (0-5): Maximum protection
+- Child (6-12): Balanced approach
+- Teen (13-17): Privacy-respecting safety
+
+---
+
+## 📊 Current Status
+
+**Phase 0:** ✅ Complete (Dashboard, auth, AI engine)  
+**Phase 1:** 🔄 In Progress (iOS Screen Time integration)  
+**Phase 2:** ⏳ Planned (Android + Windows)  
+**Phase 3:** ⏳ Planned (AI enhancements)
+
+See [ROADMAP.md](ROADMAP.md) for full timeline.
+
+---
+
+## 📚 Documentation
+
+- [ROADMAP.md](ROADMAP.md) - Development plan
+- [NETWORK_SETUP.md](NETWORK_SETUP.md) - Access from other devices
+- [APPLE_OAUTH_SETUP.md](APPLE_OAUTH_SETUP.md) - iOS integration guide
+- [DEVICE_API_RESEARCH.md](DEVICE_API_RESEARCH.md) - Platform API details
+- [DASHBOARD_QUICKSTART.md](DASHBOARD_QUICKSTART.md) - Dashboard guide
+
+---
+
+## 🛡️ Privacy & Security
+
+- All processing happens locally
+- No data sent to external servers
+- OS account credentials handled by OAuth (never stored)
+- Activity logs stored locally only
+- Open source - audit the code yourself
+
+---
+
+## 📄 License
+
+MIT License - See [LICENSE](LICENSE) file
+
+---
+
+**PocketFence-Family** - Smart parental controls that work with what devices already have. 🛡️✨

@@ -175,33 +175,37 @@ public class Program
 // Lightweight AI engine optimized for local inference
 public class SimpleAI
 {
-    private readonly Dictionary<string, double> _threatKeywords;
-    private readonly Dictionary<string, double> _safePatterns;
+    // Static shared dictionaries - allocated once per app lifetime
+    private static readonly Dictionary<string, double> _threatKeywords = new()
+    {
+        // High-risk keywords
+        { "malware", 0.9 }, { "virus", 0.9 }, { "phishing", 0.95 },
+        { "adult", 0.8 }, { "gambling", 0.7 }, { "violence", 0.85 },
+        { "drugs", 0.8 }, { "weapons", 0.85 }, { "hate", 0.9 },
+        
+        // Medium-risk keywords
+        { "download", 0.4 }, { "free", 0.3 }, { "click", 0.3 },
+        { "urgent", 0.5 }, { "limited", 0.4 }, { "offer", 0.3 }
+    };
+    
+    private static readonly Dictionary<string, double> _safePatterns = new()
+    {
+        { "education", -0.3 }, { "learning", -0.3 }, { "school", -0.3 },
+        { "tutorial", -0.2 }, { "help", -0.2 }, { "support", -0.2 },
+        { "documentation", -0.3 }, { "official", -0.3 }
+    };
+    
+    // Recommendation cache - key: "deviceType|age|concerns", value: cached result
+    private static readonly Dictionary<string, SetupRecommendationData> _recommendationCache = new();
+    private static readonly object _cacheLock = new();
+    private const int MaxCacheSize = 100; // Limit cache to prevent memory bloat
+    
     private int _processedCount = 0;
     private readonly Dashboard.SettingsManager? _settingsManager;
     
     public SimpleAI(Dashboard.SettingsManager? settingsManager = null)
     {
         _settingsManager = settingsManager;
-        
-        _threatKeywords = new Dictionary<string, double>
-        {
-            // High-risk keywords
-            { "malware", 0.9 }, { "virus", 0.9 }, { "phishing", 0.95 },
-            { "adult", 0.8 }, { "gambling", 0.7 }, { "violence", 0.85 },
-            { "drugs", 0.8 }, { "weapons", 0.85 }, { "hate", 0.9 },
-            
-            // Medium-risk keywords
-            { "download", 0.4 }, { "free", 0.3 }, { "click", 0.3 },
-            { "urgent", 0.5 }, { "limited", 0.4 }, { "offer", 0.3 }
-        };
-        
-        _safePatterns = new Dictionary<string, double>
-        {
-            { "education", -0.3 }, { "learning", -0.3 }, { "school", -0.3 },
-            { "tutorial", -0.2 }, { "help", -0.2 }, { "support", -0.2 },
-            { "documentation", -0.3 }, { "official", -0.3 }
-        };
     }
     
     public Task InitializeAsync()
@@ -313,32 +317,86 @@ public class SimpleAI
     public int GetProcessedCount() => _processedCount;
 
     /// <summary>
-    /// Generate age-appropriate setup recommendations based on device, age, and parent concerns
+    /// Clear the recommendation cache (useful for testing or memory management)
+    /// </summary>
+    public static void ClearCache()
+    {
+        lock (_cacheLock)
+        {
+            _recommendationCache.Clear();
+        }
+    }
+
+    /// <summary>
+    /// Get cache statistics for monitoring
+    /// </summary>
+    public static (int Size, int MaxSize) GetCacheStats()
+    {
+        lock (_cacheLock)
+        {
+            return (_recommendationCache.Count, MaxCacheSize);
+        }
+    }
+
+    /// <summary>
+    /// Generate age-appropriate setup recommendations with caching for performance
     /// </summary>
     public SetupRecommendationData GenerateSetupRecommendations(string deviceType, int childAge, List<string> concerns)
     {
+        // Create cache key from inputs
+        var concernsKey = concerns.Any() ? string.Join(",", concerns.OrderBy(c => c)) : "none";
+        var cacheKey = $"{deviceType}|{childAge}|{concernsKey}";
+        
+        // Check cache first (thread-safe)
+        lock (_cacheLock)
+        {
+            if (_recommendationCache.TryGetValue(cacheKey, out var cached))
+            {
+                // Return cached result - avoid regenerating same recommendations
+                return cached;
+            }
+        }
+        
+        // Generate new recommendations
+        var data = GenerateRecommendationsInternal(deviceType, childAge, concerns);
+        
+        // Store in cache (thread-safe, with size limit)
+        lock (_cacheLock)
+        {
+            if (_recommendationCache.Count >= MaxCacheSize)
+            {
+                // Simple eviction: remove oldest (first) entry
+                var firstKey = _recommendationCache.Keys.First();
+                _recommendationCache.Remove(firstKey);
+            }
+            _recommendationCache[cacheKey] = data;
+        }
+        
+        return data;
+    }
+
+    /// <summary>
+    /// Internal method that does the actual generation work
+    /// </summary>
+    private SetupRecommendationData GenerateRecommendationsInternal(string deviceType, int childAge, List<string> concerns)
+    {
+        // Pre-allocate with capacity hints to avoid resizing
         var data = new SetupRecommendationData
         {
             DeviceType = deviceType,
             ChildAge = childAge,
-            Concerns = concerns
+            Concerns = concerns,
+            Recommendations = new List<Recommendation>(10), // Expect ~10 recommendations
+            AppsToBlock = new List<string>(15), // Expect ~15 apps
+            AppsToAllow = new List<string>(10)  // Expect ~10 apps
         };
 
-        // Determine age bracket
-        string ageBracket = childAge switch
-        {
-            <= 5 => "toddler",
-            <= 12 => "child",
-            _ => "teen"
-        };
+        // Determine age bracket (inline for performance)
+        string ageBracket = childAge <= 5 ? "toddler" : childAge <= 12 ? "child" : "teen";
 
-        // Generate summary based on age and concerns
+        // Generate all data
         data.Summary = GenerateSummary(ageBracket, childAge, deviceType, concerns);
-
-        // Generate recommendations based on device type and age
         data.Recommendations = GenerateRecommendations(deviceType, ageBracket, concerns);
-
-        // Generate app lists
         data.AppsToBlock = GetAppsToBlock(ageBracket, deviceType, concerns);
         data.AppsToAllow = GetAppsToAllow(ageBracket);
 
@@ -369,107 +427,117 @@ public class SimpleAI
 
     private List<Recommendation> GenerateRecommendations(string deviceType, string ageBracket, List<string> concerns)
     {
-        var recommendations = new List<Recommendation>();
+        // Pre-allocate list with expected capacity
+        var recommendations = new List<Recommendation>(10);
         int idCounter = 1;
 
         // Core recommendations based on age bracket
-        if (ageBracket == "toddler")
+        switch (ageBracket)
         {
-            recommendations.Add(new Recommendation
-            {
-                Id = $"rec{idCounter++}",
-                Title = "Block All Social Media & Communication Apps",
-                Description = "Prevent access to Facebook, Instagram, TikTok, Snapchat, messaging apps. Toddlers don't need social interaction online.",
-                Priority = "High"
-            });
+            case "toddler":
+                recommendations.Add(new Recommendation
+                {
+                    Id = $"rec{idCounter++}",
+                    Title = "Block All Social Media & Communication Apps",
+                    Description = "Prevent access to Facebook, Instagram, TikTok, Snapchat, messaging apps. Toddlers don't need social interaction online.",
+                    Priority = "High"
+                });
 
-            recommendations.Add(new Recommendation
-            {
-                Id = $"rec{idCounter++}",
-                Title = "Enable Maximum Content Restrictions",
-                Description = "Block all movies/TV above G rating, restrict web content to only educational sites, disable app downloads.",
-                Priority = "High"
-            });
+                recommendations.Add(new Recommendation
+                {
+                    Id = $"rec{idCounter++}",
+                    Title = "Enable Maximum Content Restrictions",
+                    Description = "Block all movies/TV above G rating, restrict web content to only educational sites, disable app downloads.",
+                    Priority = "High"
+                });
 
-            recommendations.Add(new Recommendation
-            {
-                Id = $"rec{idCounter++}",
-                Title = "Set Daily Time Limit: 1 Hour",
-                Description = "Limit total screen time to 1 hour per day for healthy development.",
-                Priority = "High"
-            });
+                recommendations.Add(new Recommendation
+                {
+                    Id = $"rec{idCounter++}",
+                    Title = "Set Daily Time Limit: 1 Hour",
+                    Description = "Limit total screen time to 1 hour per day for healthy development.",
+                    Priority = "High"
+                });
+                break;
+
+            case "child":
+                recommendations.Add(new Recommendation
+                {
+                    Id = $"rec{idCounter++}",
+                    Title = "Block Most Social Media Platforms",
+                    Description = "Block TikTok, Snapchat, Instagram. Allow YouTube Kids only (not regular YouTube).",
+                    Priority = "High"
+                });
+
+                recommendations.Add(new Recommendation
+                {
+                    Id = $"rec{idCounter++}",
+                    Title = "Set Daily Time Limit: 2-3 Hours",
+                    Description = "Limit screen time to 2-3 hours on weekdays, slightly more on weekends.",
+                    Priority = "High"
+                });
+
+                recommendations.Add(new Recommendation
+                {
+                    Id = $"rec{idCounter++}",
+                    Title = "Enable Moderate Content Filtering",
+                    Description = "Block mature content (PG-13+), restrict explicit music/books, filter web searches.",
+                    Priority = "High"
+                });
+
+                recommendations.Add(new Recommendation
+                {
+                    Id = $"rec{idCounter++}",
+                    Title = "Require Approval for App Downloads",
+                    Description = "All app installations must be approved by parent first.",
+                    Priority = "Medium"
+                });
+                break;
+
+            default: // teen
+                recommendations.Add(new Recommendation
+                {
+                    Id = $"rec{idCounter++}",
+                    Title = "Enable Content Filters (Not Total Blocks)",
+                    Description = "Filter explicit content, violent/hateful material, but allow age-appropriate social media use.",
+                    Priority = "High"
+                });
+
+                recommendations.Add(new Recommendation
+                {
+                    Id = $"rec{idCounter++}",
+                    Title = "Set Downtime Hours (10PM - 7AM)",
+                    Description = "Prevent late-night usage that disrupts sleep. Device locks during bedtime hours.",
+                    Priority = "High"
+                });
+
+                recommendations.Add(new Recommendation
+                {
+                    Id = $"rec{idCounter++}",
+                    Title = "Monitor Communication Apps",
+                    Description = "Enable message previews and monitoring for messaging/social apps without reading everything.",
+                    Priority = "Medium"
+                });
+
+                recommendations.Add(new Recommendation
+                {
+                    Id = $"rec{idCounter++}",
+                    Title = "Set Daily Time Limit: 3-4 Hours",
+                    Description = "Reasonable limit that allows homework and socialization but prevents addiction.",
+                    Priority = "Medium"
+                });
+                break;
         }
-        else if (ageBracket == "child")
-        {
-            recommendations.Add(new Recommendation
-            {
-                Id = $"rec{idCounter++}",
-                Title = "Block Most Social Media Platforms",
-                Description = "Block TikTok, Snapchat, Instagram. Allow YouTube Kids only (not regular YouTube).",
-                Priority = "High"
-            });
 
-            recommendations.Add(new Recommendation
-            {
-                Id = $"rec{idCounter++}",
-                Title = "Set Daily Time Limit: 2-3 Hours",
-                Description = "Limit screen time to 2-3 hours on weekdays, slightly more on weekends.",
-                Priority = "High"
-            });
+        // Add concern-specific recommendations (check once, avoid repeated lookups)
+        var hasSocialMedia = concerns.Contains("SocialMedia");
+        var hasInappropriate = concerns.Contains("InappropriateContent");
+        var hasGaming = concerns.Contains("Gaming");
+        var hasStrangers = concerns.Contains("OnlineStrangers");
+        var hasBullying = concerns.Contains("Cyberbullying");
+        var hasScreenTime = concerns.Contains("ScreenTime");
 
-            recommendations.Add(new Recommendation
-            {
-                Id = $"rec{idCounter++}",
-                Title = "Enable Moderate Content Filtering",
-                Description = "Block mature content (PG-13+), restrict explicit music/books, filter web searches.",
-                Priority = "High"
-            });
-
-            recommendations.Add(new Recommendation
-            {
-                Id = $"rec{idCounter++}",
-                Title = "Require Approval for App Downloads",
-                Description = "All app installations must be approved by parent first.",
-                Priority = "Medium"
-            });
-        }
-        else // teen
-        {
-            recommendations.Add(new Recommendation
-            {
-                Id = $"rec{idCounter++}",
-                Title = "Enable Content Filters (Not Total Blocks)",
-                Description = "Filter explicit content, violent/hateful material, but allow age-appropriate social media use.",
-                Priority = "High"
-            });
-
-            recommendations.Add(new Recommendation
-            {
-                Id = $"rec{idCounter++}",
-                Title = "Set Downtime Hours (10PM - 7AM)",
-                Description = "Prevent late-night usage that disrupts sleep. Device locks during bedtime hours.",
-                Priority = "High"
-            });
-
-            recommendations.Add(new Recommendation
-            {
-                Id = $"rec{idCounter++}",
-                Title = "Monitor Communication Apps",
-                Description = "Enable message previews and monitoring for messaging/social apps without reading everything.",
-                Priority = "Medium"
-            });
-
-            recommendations.Add(new Recommendation
-            {
-                Id = $"rec{idCounter++}",
-                Title = "Set Daily Time Limit: 3-4 Hours",
-                Description = "Reasonable limit that allows homework and socialization but prevents addiction.",
-                Priority = "Medium"
-            });
-        }
-
-        // Add concern-specific recommendations
-        if (concerns.Contains("SocialMedia"))
+        if (hasSocialMedia)
         {
             recommendations.Add(new Recommendation
             {
@@ -484,7 +552,7 @@ public class SimpleAI
             });
         }
 
-        if (concerns.Contains("InappropriateContent"))
+        if (hasInappropriate)
         {
             recommendations.Add(new Recommendation
             {
@@ -495,7 +563,7 @@ public class SimpleAI
             });
         }
 
-        if (concerns.Contains("Gaming"))
+        if (hasGaming)
         {
             recommendations.Add(new Recommendation
             {
@@ -506,7 +574,7 @@ public class SimpleAI
             });
         }
 
-        if (concerns.Contains("OnlineStrangers"))
+        if (hasStrangers)
         {
             recommendations.Add(new Recommendation
             {
@@ -517,7 +585,7 @@ public class SimpleAI
             });
         }
 
-        if (concerns.Contains("Cyberbullying"))
+        if (hasBullying)
         {
             recommendations.Add(new Recommendation
             {
@@ -542,65 +610,86 @@ public class SimpleAI
         return recommendations;
     }
 
+    // Static readonly app lists - allocated once, reused for all requests
+    private static readonly string[] ToddlerBlockList = new[]
+    {
+        "TikTok", "Instagram", "Snapchat", "Facebook", "Twitter/X",
+        "YouTube", "WhatsApp", "Messenger", "Discord", "Reddit",
+        "Twitch", "OnlyFans", "Tinder", "Bumble"
+    };
+    
+    private static readonly string[] ChildBlockList = new[]
+    {
+        "TikTok", "Snapchat", "Instagram", "Twitter/X", "Reddit",
+        "Discord", "OnlyFans", "Tinder", "Bumble", "Omegle"
+    };
+    
+    private static readonly string[] TeenBlockList = new[]
+    {
+        "OnlyFans", "Tinder", "Bumble", "Omegle", "Adult apps"
+    };
+    
+    private static readonly string[] GamingBlockList = new[]
+    {
+        "Roblox (limit hours)", "Fortnite", "Call of Duty", "GTA", "Mature-rated games"
+    };
+
+    private static readonly string[] ToddlerAllowList = new[]
+    {
+        "YouTube Kids", "PBS Kids Video", "Khan Academy Kids",
+        "ABCmouse", "Duolingo ABC", "Epic! Kids Books"
+    };
+    
+    private static readonly string[] ChildAllowList = new[]
+    {
+        "YouTube Kids", "Khan Academy", "Duolingo", "Scratch",
+        "Google Classroom", "Zoom", "Microsoft Teams (school)",
+        "Educational apps approved by school"
+    };
+    
+    private static readonly string[] TeenAllowList = new[]
+    {
+        "YouTube (with restrictions)", "Spotify", "Netflix (age-appropriate)",
+        "Google Classroom", "School-required apps", "Study/productivity apps"
+    };
+
     private List<string> GetAppsToBlock(string ageBracket, string deviceType, List<string> concerns)
     {
-        var blocklist = new List<string>();
-
-        // Base blocklist by age
-        if (ageBracket == "toddler")
+        // Use pre-allocated lists and combine efficiently
+        var blocklist = new List<string>(20); // Pre-allocate reasonable size
+        
+        // Add base blocklist based on age (use arrays to avoid repeated allocations)
+        switch (ageBracket)
         {
-            blocklist.AddRange(new[]
-            {
-                "TikTok", "Instagram", "Snapchat", "Facebook", "Twitter/X",
-                "YouTube", "WhatsApp", "Messenger", "Discord", "Reddit",
-                "Twitch", "OnlyFans", "Tinder", "Bumble"
-            });
-        }
-        else if (ageBracket == "child")
-        {
-            blocklist.AddRange(new[]
-            {
-                "TikTok", "Snapchat", "Instagram", "Twitter/X", "Reddit",
-                "Discord", "OnlyFans", "Tinder", "Bumble", "Omegle"
-            });
-        }
-        else // teen
-        {
-            blocklist.AddRange(new[]
-            {
-                "OnlyFans", "Tinder", "Bumble", "Omegle", "Adult apps"
-            });
+            case "toddler":
+                blocklist.AddRange(ToddlerBlockList);
+                break;
+            case "child":
+                blocklist.AddRange(ChildBlockList);
+                break;
+            default: // teen
+                blocklist.AddRange(TeenBlockList);
+                break;
         }
 
         // Add concern-specific blocks
         if (concerns.Contains("Gaming"))
         {
-            blocklist.AddRange(new[] { "Roblox (limit hours)", "Fortnite", "Call of Duty", "GTA", "Mature-rated games" });
+            blocklist.AddRange(GamingBlockList);
         }
 
+        // Return distinct list (only needed if Gaming added duplicates)
         return blocklist.Distinct().ToList();
     }
 
     private List<string> GetAppsToAllow(string ageBracket)
     {
+        // Return copies of static arrays as lists
         return ageBracket switch
         {
-            "toddler" => new List<string>
-            {
-                "YouTube Kids", "PBS Kids Video", "Khan Academy Kids",
-                "ABCmouse", "Duolingo ABC", "Epic! Kids Books"
-            },
-            "child" => new List<string>
-            {
-                "YouTube Kids", "Khan Academy", "Duolingo", "Scratch",
-                "Google Classroom", "Zoom", "Microsoft Teams (school)",
-                "Educational apps approved by school"
-            },
-            "teen" => new List<string>
-            {
-                "YouTube (with restrictions)", "Spotify", "Netflix (age-appropriate)",
-                "Google Classroom", "School-required apps", "Study/productivity apps"
-            },
+            "toddler" => new List<string>(ToddlerAllowList),
+            "child" => new List<string>(ChildAllowList),
+            "teen" => new List<string>(TeenAllowList),
             _ => new List<string>()
         };
     }

@@ -208,11 +208,10 @@ public class SimpleAI
         _settingsManager = settingsManager;
     }
     
-    public Task InitializeAsync()
+    public async Task InitializeAsync()
     {
         // Simulate model loading - in real implementation this would load ML models
-        Thread.Sleep(100);
-        return Task.CompletedTask;
+        await Task.Delay(100);
     }
     
     public Task<double> AnalyzeThreatLevelAsync(string content)
@@ -752,11 +751,10 @@ public class ContentFilter
         };
     }
     
-    public Task LoadFiltersAsync()
+    public async Task LoadFiltersAsync()
     {
         // Simulate loading filters - in real implementation load from file/database
-        Thread.Sleep(50);
-        return Task.CompletedTask;
+        await Task.Delay(50);
     }
     
     /// <summary>

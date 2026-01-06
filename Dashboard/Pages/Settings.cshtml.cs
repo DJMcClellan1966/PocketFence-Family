@@ -59,7 +59,7 @@ public class SettingsModel : AuthenticatedPageModel
             var settings = await _settingsManager.LoadSettingsAsync();
             
             Console.WriteLine("[SETTINGS] Updating settings...");
-            settings.FilterLevel = filterLevel.ToLower();
+            settings.FilterLevel = filterLevel?.ToLower() ?? "medium";
             settings.NotificationEmail = notificationEmail ?? "";
             settings.BlockedCategories = blockedCategories ?? new List<string>();
             

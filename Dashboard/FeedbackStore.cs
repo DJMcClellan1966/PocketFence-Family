@@ -16,7 +16,7 @@ public class FeedbackStore
         Directory.CreateDirectory(Path.GetDirectoryName(_dataPath)!);
     }
 
-    public async Task SaveFeedbackAsync(RecommendationFeedback feedback)
+    public async Task<bool> SaveFeedbackAsync(RecommendationFeedback feedback)
     {
         await _fileLock.WaitAsync();
         try
@@ -36,6 +36,27 @@ public class FeedbackStore
             await File.WriteAllTextAsync(_dataPath, json);
             
             Console.WriteLine($"✅ Feedback saved: {feedback.Id} (Rating: {feedback.HelpfulnessRating}/5, Implemented: {feedback.ImplementedRecommendations.Count})");
+            return true;
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            Console.WriteLine($"❌ Permission denied saving feedback: {ex.Message}");
+            return false;
+        }
+        catch (IOException ex)
+        {
+            Console.WriteLine($"❌ I/O error saving feedback (disk full?): {ex.Message}");
+            return false;
+        }
+        catch (JsonException ex)
+        {
+            Console.WriteLine($"❌ JSON serialization error: {ex.Message}");
+            return false;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Unexpected error saving feedback: {ex.Message}");
+            return false;
         }
         finally
         {

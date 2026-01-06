@@ -26,6 +26,11 @@ public class User
     public bool IsActive { get; set; } = true;
     public string Role { get; set; } = "Parent"; // Parent, Child, Admin
     public Dictionary<string, string> Metadata { get; set; } = new();
+    
+    /// <summary>
+    /// List of children in this family (multi-child support)
+    /// </summary>
+    public List<ChildProfile> Children { get; set; } = new();
 }
 
 /// <summary>

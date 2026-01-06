@@ -14,72 +14,196 @@
                 <p class="lead text-muted">Step-by-step instructions to protect your child</p>
             </div>
 
-            <!-- Coming Soon Notice -->
-            <div class="alert alert-info">
-                <h5 class="alert-heading"><i class="bi bi-info-circle"></i> Visual Guides Coming Soon</h5>
-                <p>
-                    We're creating detailed photo guides with screenshots for every step. 
-                    For now, here are the basic instructions to get started.
-                </p>
-            </div>
-
             @if (Model.DeviceType == "iOS")
             {
                 <!-- iOS Screen Time Guide -->
                 <div class="card shadow-sm mb-4">
                     <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0">How to Enable iOS Screen Time</h5>
+                        <h5 class="mb-0"><i class="bi bi-apple"></i> Part 1: Enable iOS Screen Time</h5>
                     </div>
                     <div class="card-body">
-                        <ol class="guide-steps">
-                            <li class="mb-3">
-                                <strong>Open Settings app</strong> on your child's iPhone or iPad
-                            </li>
-                            <li class="mb-3">
-                                <strong>Tap "Screen Time"</strong> (near the bottom of Settings)
-                            </li>
-                            <li class="mb-3">
-                                <strong>Tap "Turn On Screen Time"</strong>
-                            </li>
-                            <li class="mb-3">
-                                <strong>Select "This is My Child's iPhone"</strong>
-                            </li>
-                            <li class="mb-3">
-                                <strong>Follow the prompts</strong> to set up Downtime, App Limits, and Content Restrictions
-                            </li>
-                            <li class="mb-3">
-                                <strong>Set a Screen Time passcode</strong> that only you know
-                            </li>
-                        </ol>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h6 class="text-primary">Step 1: Open Settings</h6>
+                                <img src="~/images/guides/ios/01-settings-app.png" 
+                                     class="img-fluid rounded shadow-sm mb-2" 
+                                     alt="iPhone Settings app icon"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div style="display:none;" class="alert alert-secondary">
+                                    <small>📸 Screenshot placeholder: Settings app icon</small>
+                                </div>
+                                <p>Find and tap the <strong>Settings</strong> app on your child's iPhone or iPad (gray icon with gears).</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-primary">Step 2: Find Screen Time</h6>
+                                <img src="~/images/guides/ios/02-screentime-location.png" 
+                                     class="img-fluid rounded shadow-sm mb-2" 
+                                     alt="Screen Time location in Settings"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div style="display:none;" class="alert alert-secondary">
+                                    <small>📸 Screenshot placeholder: Screen Time in Settings menu</small>
+                                </div>
+                                <p>Scroll down and tap <strong>"Screen Time"</strong> (usually near General and Siri).</p>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h6 class="text-primary">Step 3: Turn On Screen Time</h6>
+                                <img src="~/images/guides/ios/03-turn-on-screentime.png" 
+                                     class="img-fluid rounded shadow-sm mb-2" 
+                                     alt="Turn On Screen Time button"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div style="display:none;" class="alert alert-secondary">
+                                    <small>📸 Screenshot placeholder: Turn On Screen Time button</small>
+                                </div>
+                                <p>Tap the blue <strong>"Turn On Screen Time"</strong> button.</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-primary">Step 4: Select Child's Device</h6>
+                                <img src="~/images/guides/ios/04-this-is-my-childs-iphone.png" 
+                                     class="img-fluid rounded shadow-sm mb-2" 
+                                     alt="This is My Child's iPhone option"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div style="display:none;" class="alert alert-secondary">
+                                    <small>📸 Screenshot placeholder: "This is My Child's iPhone" selection</small>
+                                </div>
+                                <p>Choose <strong>"This is My Child's iPhone"</strong> (not "This is My iPhone").</p>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <strong>⚠️ Important:</strong> Set a Screen Time passcode that only <em>you</em> know. Don't share it with your child!
+                        </div>
                     </div>
                 </div>
 
                 <div class="card shadow-sm mb-4">
                     <div class="card-header bg-danger text-white">
-                        <h5 class="mb-0">How to Block Specific Apps</h5>
+                        <h5 class="mb-0"><i class="bi bi-app-indicator"></i> Part 2: Block Specific Apps</h5>
                     </div>
                     <div class="card-body">
-                        <ol class="guide-steps">
-                            <li class="mb-3">Settings → Screen Time → <strong>Content & Privacy Restrictions</strong></li>
-                            <li class="mb-3">Tap <strong>Allowed Apps</strong></li>
-                            <li class="mb-3">Toggle OFF any apps you want to block (TikTok, Instagram, etc.)</li>
-                            <li class="mb-3">The apps will disappear from the home screen</li>
-                        </ol>
+                        <p class="lead">Example: Blocking TikTok and Instagram</p>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <h6 class="text-danger">Step 1: App Limits</h6>
+                                <img src="~/images/guides/ios/05-app-limits-menu.png" 
+                                     class="img-fluid rounded shadow-sm mb-2" 
+                                     alt="App Limits menu in Screen Time"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div style="display:none;" class="alert alert-secondary">
+                                    <small>📸 Screenshot: App Limits location</small>
+                                </div>
+                                <p><small>Go to Screen Time → <strong>App Limits</strong></small></p>
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="text-danger">Step 2: Add Limit</h6>
+                                <img src="~/images/guides/ios/06-add-limit-button.png" 
+                                     class="img-fluid rounded shadow-sm mb-2" 
+                                     alt="Add Limit button"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div style="display:none;" class="alert alert-secondary">
+                                    <small>📸 Screenshot: Add Limit button</small>
+                                </div>
+                                <p><small>Tap <strong>"Add Limit"</strong></small></p>
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="text-danger">Step 3: Select Category</h6>
+                                <img src="~/images/guides/ios/07-select-social-networking.png" 
+                                     class="img-fluid rounded shadow-sm mb-2" 
+                                     alt="Selecting Social Networking category"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div style="display:none;" class="alert alert-secondary">
+                                    <small>📸 Screenshot: Social Networking selected</small>
+                                </div>
+                                <p><small>Choose <strong>"Social Networking"</strong> (blocks TikTok, Instagram, Snapchat, etc.)</small></p>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h6 class="text-danger">Step 4: Set Time to 1 Minute</h6>
+                                <img src="~/images/guides/ios/08-set-time-1-minute.png" 
+                                     class="img-fluid rounded shadow-sm mb-2" 
+                                     alt="Setting time limit to 1 minute"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div style="display:none;" class="alert alert-secondary">
+                                    <small>📸 Screenshot: Time set to 1 minute</small>
+                                </div>
+                                <p>Set the limit to <strong>1 minute</strong> (this effectively blocks the apps all day).</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-danger">Step 5: Confirm</h6>
+                                <img src="~/images/guides/ios/09-add-limit-confirmation.png" 
+                                     class="img-fluid rounded shadow-sm mb-2" 
+                                     alt="Confirmation screen"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div style="display:none;" class="alert alert-secondary">
+                                    <small>📸 Screenshot: Confirmation</small>
+                                </div>
+                                <p>Tap <strong>"Add"</strong> in the top right. Done!</p>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-success">
+                            <strong>💡 Pro Tip:</strong> Repeat this process for other categories like Gaming, Entertainment, or select individual apps.
+                        </div>
                     </div>
                 </div>
 
                 <div class="card shadow-sm mb-4">
                     <div class="card-header bg-warning">
-                        <h5 class="mb-0">How to Set Time Limits</h5>
+                        <h5 class="mb-0"><i class="bi bi-shield-check"></i> Part 3: Block Inappropriate Content</h5>
                     </div>
                     <div class="card-body">
-                        <ol class="guide-steps">
-                            <li class="mb-3">Settings → Screen Time → <strong>App Limits</strong></li>
-                            <li class="mb-3">Tap <strong>Add Limit</strong></li>
-                            <li class="mb-3">Select category (Social, Games, Entertainment) or specific apps</li>
-                            <li class="mb-3">Set daily time limit (e.g., 2 hours)</li>
-                            <li class="mb-3">Tap <strong>Add</strong></li>
-                        </ol>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <h6 class="text-warning">Step 1: Content Restrictions</h6>
+                                <img src="~/images/guides/ios/10-content-restrictions-toggle.png" 
+                                     class="img-fluid rounded shadow-sm mb-2" 
+                                     alt="Content & Privacy Restrictions toggle"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div style="display:none;" class="alert alert-secondary">
+                                    <small>📸 Screenshot: Restrictions toggle</small>
+                                </div>
+                                <p><small>Go to Screen Time → <strong>Content & Privacy Restrictions</strong> → Toggle ON</small></p>
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="text-warning">Step 2: Web Content</h6>
+                                <img src="~/images/guides/ios/11-web-content-menu.png" 
+                                     class="img-fluid rounded shadow-sm mb-2" 
+                                     alt="Web Content settings menu"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div style="display:none;" class="alert alert-secondary">
+                                    <small>📸 Screenshot: Web Content option</small>
+                                </div>
+                                <p><small>Tap <strong>"Content Restrictions"</strong> → <strong>"Web Content"</strong></small></p>
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="text-warning">Step 3: Limit Adult Sites</h6>
+                                <img src="~/images/guides/ios/12-limit-adult-websites.png" 
+                                     class="img-fluid rounded shadow-sm mb-2" 
+                                     alt="Limit Adult Websites option selected"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div style="display:none;" class="alert alert-secondary">
+                                    <small>📸 Screenshot: Limit Adult Websites</small>
+                                </div>
+                                <p><small>Select <strong>"Limit Adult Websites"</strong> (recommended for most kids)</small></p>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <strong>📖 More Restrictions:</strong> In the same menu, you can also restrict:
+                            <ul class="mb-0 mt-2">
+                                <li>Explicit music, podcasts, and news</li>
+                                <li>Movies and TV shows by rating</li>
+                                <li>App downloads and in-app purchases</li>
+                                <li>Siri web search and explicit language</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             }
@@ -88,29 +212,125 @@
                 <!-- Android Family Link Guide -->
                 <div class="card shadow-sm mb-4">
                     <div class="card-header bg-success text-white">
-                        <h5 class="mb-0">How to Set Up Google Family Link</h5>
+                        <h5 class="mb-0"><i class="bi bi-phone"></i> Part 1: Install Google Family Link</h5>
                     </div>
                     <div class="card-body">
-                        <ol class="guide-steps">
-                            <li class="mb-3">
-                                <strong>Download Family Link app</strong> on YOUR phone from Google Play Store
-                            </li>
-                            <li class="mb-3">
-                                <strong>Open the app</strong> and tap "Get Started"
-                            </li>
-                            <li class="mb-3">
-                                <strong>Select "Parent"</strong> and sign in with your Google account
-                            </li>
-                            <li class="mb-3">
-                                <strong>Add your child's device</strong> by entering their Google account
-                            </li>
-                            <li class="mb-3">
-                                <strong>Follow the setup wizard</strong> to configure restrictions
-                            </li>
-                        </ol>
-                        <p class="text-muted mt-3">
-                            <strong>Note:</strong> Your child must have a Google account and their device nearby during setup.
-                        </p>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h6 class="text-success">Step 1: Download on Your Phone</h6>
+                                <img src="~/images/guides/android/01-family-link-app-store.png" 
+                                     class="img-fluid rounded shadow-sm mb-2" 
+                                     alt="Family Link in Google Play Store"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div style="display:none;" class="alert alert-secondary">
+                                    <small>📸 Screenshot: Family Link app in Play Store</small>
+                                </div>
+                                <p>Open <strong>Google Play Store</strong> on YOUR phone (parent device). Search for "Google Family Link for parents" and install it.</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-success">Step 2: Open Family Link</h6>
+                                <img src="~/images/guides/android/02-open-family-link.png" 
+                                     class="img-fluid rounded shadow-sm mb-2" 
+                                     alt="Family Link app opening screen"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div style="display:none;" class="alert alert-secondary">
+                                    <small>📸 Screenshot: Family Link welcome screen</small>
+                                </div>
+                                <p>Open the app and tap <strong>"Get Started"</strong>. Select <strong>"Parent"</strong> when prompted.</p>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <strong>📋 Before You Continue:</strong> You'll need your child's Android device nearby and their Google account credentials (or create a new Google account for them).
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="bi bi-person-plus"></i> Part 2: Add Your Child</h5>
+                    </div>
+                    <div class="card-body">
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <h6 class="text-success">Step 1: Add Child Button</h6>
+                                <img src="~/images/guides/android/03-add-child-button.png" 
+                                     class="img-fluid rounded shadow-sm mb-2" 
+                                     alt="Add child button in Family Link"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div style="display:none;" class="alert alert-secondary">
+                                    <small>📸 Screenshot: Add child button</small>
+                                </div>
+                                <p><small>In Family Link, tap <strong>"Add child"</strong> or the + icon.</small></p>
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="text-success">Step 2: Enter Child's Email</h6>
+                                <img src="~/images/guides/android/04-enter-child-email.png" 
+                                     class="img-fluid rounded shadow-sm mb-2" 
+                                     alt="Enter child's Google account"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div style="display:none;" class="alert alert-secondary">
+                                    <small>📸 Screenshot: Child's email input</small>
+                                </div>
+                                <p><small>Enter your child's Gmail address or create a new account for them.</small></p>
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="text-success">Step 3: Follow Setup</h6>
+                                <img src="~/images/guides/android/05-setup-wizard.png" 
+                                     class="img-fluid rounded shadow-sm mb-2" 
+                                     alt="Family Link setup wizard"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div style="display:none;" class="alert alert-secondary">
+                                    <small>📸 Screenshot: Setup wizard</small>
+                                </div>
+                                <p><small>Follow the on-screen instructions to link your child's device.</small></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="bi bi-gear"></i> Part 3: Set Restrictions</h5>
+                    </div>
+                    <div class="card-body">
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h6 class="text-success">App Restrictions</h6>
+                                <img src="~/images/guides/android/06-app-restrictions.png" 
+                                     class="img-fluid rounded shadow-sm mb-2" 
+                                     alt="App restrictions settings"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div style="display:none;" class="alert alert-secondary">
+                                    <small>📸 Screenshot: App restrictions</small>
+                                </div>
+                                <p>In Family Link, tap your child's name → <strong>"App limits"</strong> → Set daily limits for specific apps or categories.</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-success">Content Filters</h6>
+                                <img src="~/images/guides/android/07-content-filters.png" 
+                                     class="img-fluid rounded shadow-sm mb-2" 
+                                     alt="Content filter settings"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div style="display:none;" class="alert alert-secondary">
+                                    <small>📸 Screenshot: Content filters</small>
+                                </div>
+                                <p>Tap <strong>"Filters on Google"</strong> → Enable SafeSearch, YouTube Restricted Mode, and Chrome filters.</p>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-success">
+                            <strong>✅ You're Protected!</strong> Family Link now monitors your child's device. You can:
+                            <ul class="mb-0 mt-2">
+                                <li>See app activity and screen time</li>
+                                <li>Approve or block app downloads</li>
+                                <li>Set bedtime and daily limits</li>
+                                <li>Locate their device</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             }
@@ -119,29 +339,139 @@
                 <!-- Windows Family Safety Guide -->
                 <div class="card shadow-sm mb-4">
                     <div class="card-header bg-info text-white">
-                        <h5 class="mb-0">How to Enable Microsoft Family Safety</h5>
+                        <h5 class="mb-0"><i class="bi bi-laptop"></i> Part 1: Access Microsoft Family Safety</h5>
                     </div>
                     <div class="card-body">
-                        <ol class="guide-steps">
-                            <li class="mb-3">
-                                <strong>Go to</strong> <a href="https://account.microsoft.com/family" target="_blank">account.microsoft.com/family</a>
-                            </li>
-                            <li class="mb-3">
-                                <strong>Sign in</strong> with your Microsoft account
-                            </li>
-                            <li class="mb-3">
-                                <strong>Click "Add a family member"</strong> → "Add a child"
-                            </li>
-                            <li class="mb-3">
-                                <strong>Enter your child's email</strong> or create a new account for them
-                            </li>
-                            <li class="mb-3">
-                                <strong>On their Windows PC</strong>, have them sign in with that account
-                            </li>
-                            <li class="mb-3">
-                                <strong>Back in Family Safety</strong>, configure Screen Time, App Limits, and Content Filters
-                            </li>
-                        </ol>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h6 class="text-info">Step 1: Open Family Website</h6>
+                                <img src="~/images/guides/windows/01-family-safety-website.png" 
+                                     class="img-fluid rounded shadow-sm mb-2" 
+                                     alt="Microsoft Family Safety website"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div style="display:none;" class="alert alert-secondary">
+                                    <small>📸 Screenshot: Family Safety homepage</small>
+                                </div>
+                                <p>On any device, go to <a href="https://account.microsoft.com/family" target="_blank" class="fw-bold">account.microsoft.com/family</a></p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-info">Step 2: Sign In</h6>
+                                <img src="~/images/guides/windows/02-sign-in-microsoft.png" 
+                                     class="img-fluid rounded shadow-sm mb-2" 
+                                     alt="Microsoft account sign in"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div style="display:none;" class="alert alert-secondary">
+                                    <small>📸 Screenshot: Microsoft sign in</small>
+                                </div>
+                                <p>Sign in with <strong>your Microsoft account</strong> (parent account).</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="bi bi-person-plus"></i> Part 2: Add Your Child</h5>
+                    </div>
+                    <div class="card-body">
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <h6 class="text-info">Step 1: Add Family Member</h6>
+                                <img src="~/images/guides/windows/03-add-family-member.png" 
+                                     class="img-fluid rounded shadow-sm mb-2" 
+                                     alt="Add family member button"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div style="display:none;" class="alert alert-secondary">
+                                    <small>📸 Screenshot: Add family member</small>
+                                </div>
+                                <p><small>Click <strong>"Add a family member"</strong> → Select <strong>"Add a child"</strong></small></p>
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="text-info">Step 2: Enter Child's Email</h6>
+                                <img src="~/images/guides/windows/04-enter-child-email.png" 
+                                     class="img-fluid rounded shadow-sm mb-2" 
+                                     alt="Enter child's Microsoft account"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div style="display:none;" class="alert alert-secondary">
+                                    <small>📸 Screenshot: Child email input</small>
+                                </div>
+                                <p><small>Enter your child's Microsoft account email or <strong>create a new one</strong> for them.</small></p>
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="text-info">Step 3: Child Signs In on PC</h6>
+                                <img src="~/images/guides/windows/05-child-sign-in-pc.png" 
+                                     class="img-fluid rounded shadow-sm mb-2" 
+                                     alt="Child signing into Windows"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div style="display:none;" class="alert alert-secondary">
+                                    <small>📸 Screenshot: Windows login screen</small>
+                                </div>
+                                <p><small>On their Windows PC, have your child sign in with the account you just created.</small></p>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <strong>⚠️ Important:</strong> Your child must use their Microsoft child account to sign into Windows for restrictions to work.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="bi bi-shield-lock"></i> Part 3: Configure Restrictions</h5>
+                    </div>
+                    <div class="card-body">
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h6 class="text-info">Screen Time Limits</h6>
+                                <img src="~/images/guides/windows/06-screen-time-limits.png" 
+                                     class="img-fluid rounded shadow-sm mb-2" 
+                                     alt="Screen time settings"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div style="display:none;" class="alert alert-secondary">
+                                    <small>📸 Screenshot: Screen time settings</small>
+                                </div>
+                                <p>Click your child's name → <strong>"Screen time"</strong> → Set daily limits and schedule device-free times.</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-info">Content Filters</h6>
+                                <img src="~/images/guides/windows/07-content-filters.png" 
+                                     class="img-fluid rounded shadow-sm mb-2" 
+                                     alt="Content filter settings"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div style="display:none;" class="alert alert-secondary">
+                                    <small>📸 Screenshot: Content filters</small>
+                                </div>
+                                <p>Click <strong>"Content filters"</strong> → Enable web filtering, block inappropriate sites, and set app restrictions.</p>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <h6 class="text-info">App & Game Restrictions</h6>
+                                <img src="~/images/guides/windows/08-app-restrictions.png" 
+                                     class="img-fluid rounded shadow-sm mb-2" 
+                                     alt="App and game restrictions"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div style="display:none;" class="alert alert-secondary">
+                                    <small>📸 Screenshot: App restrictions</small>
+                                </div>
+                                <p>Click <strong>"Apps and games"</strong> → Toggle <strong>"Block inappropriate apps and games"</strong> → Set age ratings (E for Everyone, T for Teen, etc.)</p>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-success">
+                            <strong>✅ Windows Protected!</strong> Your child's PC is now monitored. You can:
+                            <ul class="mb-0 mt-2">
+                                <li>View activity reports (apps used, websites visited)</li>
+                                <li>Get weekly email summaries</li>
+                                <li>Block specific websites or apps remotely</li>
+                                <li>See screen time usage</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             }
@@ -150,7 +480,7 @@
             <div class="card border-secondary mb-4">
                 <div class="card-body text-center">
                     <h5><i class="bi bi-question-circle"></i> Need More Help?</h5>
-                    <p class="text-muted">Detailed photo guides with screenshots are being created this week.</p>
+                    <p class="text-muted">Add your screenshots to make these guides even clearer! See SCREENSHOT_GUIDE.md for instructions.</p>
                     <a href="/Setup/Start" class="btn btn-outline-primary">
                         <i class="bi bi-arrow-left"></i> Back to Setup Wizard
                     </a>

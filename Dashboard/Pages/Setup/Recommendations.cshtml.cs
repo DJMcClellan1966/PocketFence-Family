@@ -61,6 +61,29 @@ public class RecommendationsModel : PageModel
 
     public async Task<IActionResult> OnPostSubmitFeedbackAsync()
     {
+        // Validate model state
+        if (!ModelState.IsValid)
+        {
+            ErrorMessage = "Please correct the errors and try again.";
+            
+            // Restore data for display
+            if (TempData["DeviceType"] is string dt &&
+                TempData["ChildAge"] is int ca)
+            {
+                DeviceType = dt;
+                ChildAge = ca;
+                if (TempData["Concerns"] is string cs)
+                {
+                    Concerns = cs.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
+                }
+                GenerateRecommendations();
+                TempData.Keep("DeviceType");
+                TempData.Keep("ChildAge");
+                TempData.Keep("Concerns");
+            }
+            return Page();
+        }
+
         // Restore recommendation data
         if (TempData["DeviceType"] is string deviceType &&
             TempData["ChildAge"] is int age)
@@ -75,6 +98,16 @@ public class RecommendationsModel : PageModel
 
             GenerateRecommendations();
 
+            // Additional validation
+            if (Rating < 1 || Rating > 5)
+            {
+                ErrorMessage = "Rating must be between 1 and 5 stars.";
+                TempData.Keep("DeviceType");
+                TempData.Keep("ChildAge");
+                TempData.Keep("Concerns");
+                return Page();
+            }
+
             // Create feedback object
             var feedback = new RecommendationFeedback
             {
@@ -84,24 +117,35 @@ public class RecommendationsModel : PageModel
                 Concerns = Concerns,
                 RecommendationsShown = Recommendations.Select(r => r.Id).ToList(),
                 HelpfulnessRating = Rating,
-                ImplementedRecommendations = ImplementedIds,
+                ImplementedRecommendations = ImplementedIds ?? new List<string>(),
                 SkippedRecommendations = Recommendations
                     .Select(r => r.Id)
-                    .Except(ImplementedIds)
+                    .Except(ImplementedIds ?? new List<string>())
                     .ToList(),
                 UserComments = Comments ?? "",
                 CreatedAt = DateTime.UtcNow
             };
 
-            // Save feedback
-            await _feedbackStore.SaveFeedbackAsync(feedback);
+            // Save feedback with error handling
+            var success = await _feedbackStore.SaveFeedbackAsync(feedback);
 
-            FeedbackSubmitted = true;
+            if (success)
+            {
+                FeedbackSubmitted = true;
+            }
+            else
+            {
+                ErrorMessage = "Failed to save feedback. Please try again later.";
+            }
 
             // Keep data for display
             TempData.Keep("DeviceType");
             TempData.Keep("ChildAge");
             TempData.Keep("Concerns");
+        }
+        else
+        {
+            ErrorMessage = "Session expired. Please complete the setup wizard again.";
         }
 
         return Page();

@@ -1,0 +1,144 @@
+@page
+@model AddChildModel
+@{
+    ViewData["Title"] = "Add Child";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0"><i class="bi bi-person-plus"></i> Add a Child to Your Family</h3>
+            </div>
+            <div class="card-body">
+                @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                {
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle"></i> @Model.ErrorMessage
+                    </div>
+                }
+
+                <form method="post">
+                    <div class="mb-4">
+                        <label for="childName" class="form-label"><strong>Child's Name</strong></label>
+                        <input type="text" class="form-control form-control-lg" id="childName" name="childName" 
+                               placeholder="Enter your child's name" required maxlength="50">
+                        <div class="form-text">This helps you identify them in your dashboard</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="childAge" class="form-label"><strong>Age</strong></label>
+                        <div class="d-flex align-items-center">
+                            <input type="range" class="form-range flex-grow-1" min="0" max="17" 
+                                   value="8" id="childAge" name="childAge" oninput="updateAgeDisplay(this.value)">
+                            <span class="ms-3 badge bg-primary fs-5" id="ageDisplay">8 years old</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label"><strong>Device Type</strong></label>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <input type="radio" class="btn-check" name="deviceType" id="deviceiOS" value="iOS" required>
+                                <label class="btn btn-outline-primary w-100 h-100 py-4" for="deviceiOS">
+                                    <i class="bi bi-apple fs-1 d-block mb-2"></i>
+                                    <strong>iPhone/iPad</strong>
+                                </label>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="radio" class="btn-check" name="deviceType" id="deviceAndroid" value="Android">
+                                <label class="btn btn-outline-success w-100 h-100 py-4" for="deviceAndroid">
+                                    <i class="bi bi-phone fs-1 d-block mb-2"></i>
+                                    <strong>Android</strong>
+                                </label>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="radio" class="btn-check" name="deviceType" id="deviceWindows" value="Windows">
+                                <label class="btn btn-outline-info w-100 h-100 py-4" for="deviceWindows">
+                                    <i class="bi bi-laptop fs-1 d-block mb-2"></i>
+                                    <strong>Windows PC</strong>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label"><strong>Your Concerns (Optional)</strong></label>
+                        <div class="form-text mb-2">Select any that apply - you can change these later</div>
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="concerns" value="SocialMedia" id="concernSocial">
+                                    <label class="form-check-label" for="concernSocial">
+                                        Social Media (TikTok, Instagram, Snapchat)
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="concerns" value="Gaming" id="concernGaming">
+                                    <label class="form-check-label" for="concernGaming">
+                                        Gaming & Screen Time
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="concerns" value="InappropriateContent" id="concernContent">
+                                    <label class="form-check-label" for="concernContent">
+                                        Inappropriate Content
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="concerns" value="OnlinePredators" id="concernPredators">
+                                    <label class="form-check-label" for="concernPredators">
+                                        Online Predators & Strangers
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="concerns" value="Cyberbullying" id="concernBullying">
+                                    <label class="form-check-label" for="concernBullying">
+                                        Cyberbullying
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="concerns" value="Privacy" id="concernPrivacy">
+                                    <label class="form-check-label" for="concernPrivacy">
+                                        Privacy & Data Sharing
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="notes" class="form-label"><strong>Notes (Optional)</strong></label>
+                        <textarea class="form-control" id="notes" name="notes" rows="3" 
+                                  placeholder="Any additional notes about this child's device usage..."></textarea>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-plus-circle"></i> Add Child
+                        </button>
+                        <a href="/" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function updateAgeDisplay(age) {
+            document.getElementById('ageDisplay').textContent = age + ' years old';
+        }
+    </script>
+}

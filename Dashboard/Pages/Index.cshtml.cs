@@ -6,10 +6,12 @@ namespace PocketFence_AI.Dashboard.Pages;
 public class IndexModel : AuthenticatedPageModel
 {
     private readonly BlockedContentStore _blockedContent;
+    private readonly UserManager _userManager;
 
-    public IndexModel(BlockedContentStore blockedContent)
+    public IndexModel(BlockedContentStore blockedContent, UserManager userManager)
     {
         _blockedContent = blockedContent;
+        _userManager = userManager;
     }
 
     public int BlockedToday { get; set; }
@@ -18,14 +20,27 @@ public class IndexModel : AuthenticatedPageModel
     public int BlockedAllTime { get; set; }
     public List<BlockedItem> RecentBlocks { get; set; } = new();
     public Dictionary<string, int> BlocksByCategory { get; set; } = new();
+    public List<ChildProfile> Children { get; set; } = new();
 
-    public void OnGet()
+    public async Task OnGetAsync()
     {
         // Authentication handled by AuthenticatedPageModel base class
         // Username already loaded from base class
 
+        // Load user's children
+        await LoadChildren();
+
         // Load real data from BlockedContentStore
         LoadRealData();
+    }
+
+    private async Task LoadChildren()
+    {
+        var user = await _userManager.GetUserByUsernameAsync(Username);
+        if (user != null)
+        {
+            Children = user.Children;
+        }
     }
 
     private void LoadRealData()

@@ -32,4 +32,10 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.15.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Exclude archived OAuth provider code from compilation -->
+    <Compile Remove="Archive\**\*.cs" />
+    <Content Remove="Archive\**\*.cshtml" />
+  </ItemGroup>
+
 </Project>

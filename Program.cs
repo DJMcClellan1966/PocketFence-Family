@@ -311,6 +311,325 @@ public class SimpleAI
     }
     
     public int GetProcessedCount() => _processedCount;
+
+    /// <summary>
+    /// Generate age-appropriate setup recommendations based on device, age, and parent concerns
+    /// </summary>
+    public SetupRecommendationData GenerateSetupRecommendations(string deviceType, int childAge, List<string> concerns)
+    {
+        var data = new SetupRecommendationData
+        {
+            DeviceType = deviceType,
+            ChildAge = childAge,
+            Concerns = concerns
+        };
+
+        // Determine age bracket
+        string ageBracket = childAge switch
+        {
+            <= 5 => "toddler",
+            <= 12 => "child",
+            _ => "teen"
+        };
+
+        // Generate summary based on age and concerns
+        data.Summary = GenerateSummary(ageBracket, childAge, deviceType, concerns);
+
+        // Generate recommendations based on device type and age
+        data.Recommendations = GenerateRecommendations(deviceType, ageBracket, concerns);
+
+        // Generate app lists
+        data.AppsToBlock = GetAppsToBlock(ageBracket, deviceType, concerns);
+        data.AppsToAllow = GetAppsToAllow(ageBracket);
+
+        return data;
+    }
+
+    private string GenerateSummary(string ageBracket, int age, string deviceType, List<string> concerns)
+    {
+        var concernText = concerns.Any() ? $" with focus on {string.Join(", ", concerns.Take(2))}" : "";
+        
+        return ageBracket switch
+        {
+            "toddler" => $"For a {age}-year-old, we recommend maximum protection{concernText}. " +
+                        "Young children need strict content filtering, no social media access, and heavy supervision. " +
+                        "Focus on educational content only.",
+            
+            "child" => $"For a {age}-year-old, we recommend balanced protection{concernText}. " +
+                      "School-age children benefit from time limits (2-3 hours), restricted social media, " +
+                      "and content filtering while allowing educational apps.",
+            
+            "teen" => $"For a {age}-year-old, we recommend privacy-respecting safety{concernText}. " +
+                     "Teens need privacy but still benefit from content filters, time management (3-4 hours), " +
+                     "and communication monitoring. Focus on building trust.",
+            
+            _ => "Please configure parental controls based on your child's maturity level."
+        };
+    }
+
+    private List<Recommendation> GenerateRecommendations(string deviceType, string ageBracket, List<string> concerns)
+    {
+        var recommendations = new List<Recommendation>();
+        int idCounter = 1;
+
+        // Core recommendations based on age bracket
+        if (ageBracket == "toddler")
+        {
+            recommendations.Add(new Recommendation
+            {
+                Id = $"rec{idCounter++}",
+                Title = "Block All Social Media & Communication Apps",
+                Description = "Prevent access to Facebook, Instagram, TikTok, Snapchat, messaging apps. Toddlers don't need social interaction online.",
+                Priority = "High"
+            });
+
+            recommendations.Add(new Recommendation
+            {
+                Id = $"rec{idCounter++}",
+                Title = "Enable Maximum Content Restrictions",
+                Description = "Block all movies/TV above G rating, restrict web content to only educational sites, disable app downloads.",
+                Priority = "High"
+            });
+
+            recommendations.Add(new Recommendation
+            {
+                Id = $"rec{idCounter++}",
+                Title = "Set Daily Time Limit: 1 Hour",
+                Description = "Limit total screen time to 1 hour per day for healthy development.",
+                Priority = "High"
+            });
+        }
+        else if (ageBracket == "child")
+        {
+            recommendations.Add(new Recommendation
+            {
+                Id = $"rec{idCounter++}",
+                Title = "Block Most Social Media Platforms",
+                Description = "Block TikTok, Snapchat, Instagram. Allow YouTube Kids only (not regular YouTube).",
+                Priority = "High"
+            });
+
+            recommendations.Add(new Recommendation
+            {
+                Id = $"rec{idCounter++}",
+                Title = "Set Daily Time Limit: 2-3 Hours",
+                Description = "Limit screen time to 2-3 hours on weekdays, slightly more on weekends.",
+                Priority = "High"
+            });
+
+            recommendations.Add(new Recommendation
+            {
+                Id = $"rec{idCounter++}",
+                Title = "Enable Moderate Content Filtering",
+                Description = "Block mature content (PG-13+), restrict explicit music/books, filter web searches.",
+                Priority = "High"
+            });
+
+            recommendations.Add(new Recommendation
+            {
+                Id = $"rec{idCounter++}",
+                Title = "Require Approval for App Downloads",
+                Description = "All app installations must be approved by parent first.",
+                Priority = "Medium"
+            });
+        }
+        else // teen
+        {
+            recommendations.Add(new Recommendation
+            {
+                Id = $"rec{idCounter++}",
+                Title = "Enable Content Filters (Not Total Blocks)",
+                Description = "Filter explicit content, violent/hateful material, but allow age-appropriate social media use.",
+                Priority = "High"
+            });
+
+            recommendations.Add(new Recommendation
+            {
+                Id = $"rec{idCounter++}",
+                Title = "Set Downtime Hours (10PM - 7AM)",
+                Description = "Prevent late-night usage that disrupts sleep. Device locks during bedtime hours.",
+                Priority = "High"
+            });
+
+            recommendations.Add(new Recommendation
+            {
+                Id = $"rec{idCounter++}",
+                Title = "Monitor Communication Apps",
+                Description = "Enable message previews and monitoring for messaging/social apps without reading everything.",
+                Priority = "Medium"
+            });
+
+            recommendations.Add(new Recommendation
+            {
+                Id = $"rec{idCounter++}",
+                Title = "Set Daily Time Limit: 3-4 Hours",
+                Description = "Reasonable limit that allows homework and socialization but prevents addiction.",
+                Priority = "Medium"
+            });
+        }
+
+        // Add concern-specific recommendations
+        if (concerns.Contains("SocialMedia"))
+        {
+            recommendations.Add(new Recommendation
+            {
+                Id = $"rec{idCounter++}",
+                Title = "Enable Social Media Restrictions",
+                Description = deviceType == "iOS" ? 
+                    "Use Screen Time to block or limit TikTok, Instagram, Snapchat." :
+                    deviceType == "Android" ?
+                    "Use Family Link to restrict social media apps and set time limits." :
+                    "Use Microsoft Family Safety to block social media websites and apps.",
+                Priority = "High"
+            });
+        }
+
+        if (concerns.Contains("InappropriateContent"))
+        {
+            recommendations.Add(new Recommendation
+            {
+                Id = $"rec{idCounter++}",
+                Title = "Enable SafeSearch & Content Filtering",
+                Description = "Turn on SafeSearch in Google, Bing, YouTube. Enable content restrictions for movies/TV/music.",
+                Priority = "High"
+            });
+        }
+
+        if (concerns.Contains("Gaming"))
+        {
+            recommendations.Add(new Recommendation
+            {
+                Id = $"rec{idCounter++}",
+                Title = "Limit Gaming Apps & In-App Purchases",
+                Description = "Set time limits specifically for games, disable in-app purchases, block mature-rated games.",
+                Priority = "Medium"
+            });
+        }
+
+        if (concerns.Contains("OnlineStrangers"))
+        {
+            recommendations.Add(new Recommendation
+            {
+                Id = $"rec{idCounter++}",
+                Title = "Disable Location Sharing & Multiplayer",
+                Description = "Turn off location services for social apps, disable chat in games, review friend requests.",
+                Priority = "High"
+            });
+        }
+
+        if (concerns.Contains("Cyberbullying"))
+        {
+            recommendations.Add(new Recommendation
+            {
+                Id = $"rec{idCounter++}",
+                Title = "Monitor Messages & Social Interactions",
+                Description = "Enable notification alerts for messages, review social media interactions weekly.",
+                Priority = "Medium"
+            });
+        }
+
+        if (concerns.Contains("ScreenTime"))
+        {
+            recommendations.Add(new Recommendation
+            {
+                Id = $"rec{idCounter++}",
+                Title = "Set App-Specific Time Limits",
+                Description = "Limit entertainment apps (games, social, video) while keeping educational apps always available.",
+                Priority = "High"
+            });
+        }
+
+        return recommendations;
+    }
+
+    private List<string> GetAppsToBlock(string ageBracket, string deviceType, List<string> concerns)
+    {
+        var blocklist = new List<string>();
+
+        // Base blocklist by age
+        if (ageBracket == "toddler")
+        {
+            blocklist.AddRange(new[]
+            {
+                "TikTok", "Instagram", "Snapchat", "Facebook", "Twitter/X",
+                "YouTube", "WhatsApp", "Messenger", "Discord", "Reddit",
+                "Twitch", "OnlyFans", "Tinder", "Bumble"
+            });
+        }
+        else if (ageBracket == "child")
+        {
+            blocklist.AddRange(new[]
+            {
+                "TikTok", "Snapchat", "Instagram", "Twitter/X", "Reddit",
+                "Discord", "OnlyFans", "Tinder", "Bumble", "Omegle"
+            });
+        }
+        else // teen
+        {
+            blocklist.AddRange(new[]
+            {
+                "OnlyFans", "Tinder", "Bumble", "Omegle", "Adult apps"
+            });
+        }
+
+        // Add concern-specific blocks
+        if (concerns.Contains("Gaming"))
+        {
+            blocklist.AddRange(new[] { "Roblox (limit hours)", "Fortnite", "Call of Duty", "GTA", "Mature-rated games" });
+        }
+
+        return blocklist.Distinct().ToList();
+    }
+
+    private List<string> GetAppsToAllow(string ageBracket)
+    {
+        return ageBracket switch
+        {
+            "toddler" => new List<string>
+            {
+                "YouTube Kids", "PBS Kids Video", "Khan Academy Kids",
+                "ABCmouse", "Duolingo ABC", "Epic! Kids Books"
+            },
+            "child" => new List<string>
+            {
+                "YouTube Kids", "Khan Academy", "Duolingo", "Scratch",
+                "Google Classroom", "Zoom", "Microsoft Teams (school)",
+                "Educational apps approved by school"
+            },
+            "teen" => new List<string>
+            {
+                "YouTube (with restrictions)", "Spotify", "Netflix (age-appropriate)",
+                "Google Classroom", "School-required apps", "Study/productivity apps"
+            },
+            _ => new List<string>()
+        };
+    }
+}
+
+public class SetupRecommendationData
+{
+    public string DeviceType { get; set; } = "";
+    public int ChildAge { get; set; }
+    public List<string> Concerns { get; set; } = new();
+    public string Summary { get; set; } = "";
+    public List<Recommendation> Recommendations { get; set; } = new();
+    public List<string> AppsToBlock { get; set; } = new();
+    public List<string> AppsToAllow { get; set; } = new();
+}
+
+public class Recommendation
+{
+    public string Id { get; set; } = "";
+    public string Title { get; set; } = "";
+    public string Description { get; set; } = "";
+    public string Priority { get; set; } = "High"; // High, Medium, Low
+    public string PriorityColor => Priority switch
+    {
+        "High" => "danger",
+        "Medium" => "warning",
+        "Low" => "info",
+        _ => "secondary"
+    };
 }
 
 // Lightweight content filter

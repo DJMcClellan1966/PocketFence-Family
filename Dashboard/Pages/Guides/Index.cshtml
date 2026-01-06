@@ -1,0 +1,172 @@
+@page "{deviceType}"
+@model GuidesModel
+@{
+    ViewData["Title"] = $"{Model.DeviceType} Setup Guide";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <h1 class="display-5 fw-bold">📚 @Model.DeviceType Setup Guide</h1>
+                <p class="lead text-muted">Step-by-step instructions to protect your child</p>
+            </div>
+
+            <!-- Coming Soon Notice -->
+            <div class="alert alert-info">
+                <h5 class="alert-heading"><i class="bi bi-info-circle"></i> Visual Guides Coming Soon</h5>
+                <p>
+                    We're creating detailed photo guides with screenshots for every step. 
+                    For now, here are the basic instructions to get started.
+                </p>
+            </div>
+
+            @if (Model.DeviceType == "iOS")
+            {
+                <!-- iOS Screen Time Guide -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">How to Enable iOS Screen Time</h5>
+                    </div>
+                    <div class="card-body">
+                        <ol class="guide-steps">
+                            <li class="mb-3">
+                                <strong>Open Settings app</strong> on your child's iPhone or iPad
+                            </li>
+                            <li class="mb-3">
+                                <strong>Tap "Screen Time"</strong> (near the bottom of Settings)
+                            </li>
+                            <li class="mb-3">
+                                <strong>Tap "Turn On Screen Time"</strong>
+                            </li>
+                            <li class="mb-3">
+                                <strong>Select "This is My Child's iPhone"</strong>
+                            </li>
+                            <li class="mb-3">
+                                <strong>Follow the prompts</strong> to set up Downtime, App Limits, and Content Restrictions
+                            </li>
+                            <li class="mb-3">
+                                <strong>Set a Screen Time passcode</strong> that only you know
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0">How to Block Specific Apps</h5>
+                    </div>
+                    <div class="card-body">
+                        <ol class="guide-steps">
+                            <li class="mb-3">Settings → Screen Time → <strong>Content & Privacy Restrictions</strong></li>
+                            <li class="mb-3">Tap <strong>Allowed Apps</strong></li>
+                            <li class="mb-3">Toggle OFF any apps you want to block (TikTok, Instagram, etc.)</li>
+                            <li class="mb-3">The apps will disappear from the home screen</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-warning">
+                        <h5 class="mb-0">How to Set Time Limits</h5>
+                    </div>
+                    <div class="card-body">
+                        <ol class="guide-steps">
+                            <li class="mb-3">Settings → Screen Time → <strong>App Limits</strong></li>
+                            <li class="mb-3">Tap <strong>Add Limit</strong></li>
+                            <li class="mb-3">Select category (Social, Games, Entertainment) or specific apps</li>
+                            <li class="mb-3">Set daily time limit (e.g., 2 hours)</li>
+                            <li class="mb-3">Tap <strong>Add</strong></li>
+                        </ol>
+                    </div>
+                </div>
+            }
+            else if (Model.DeviceType == "Android")
+            {
+                <!-- Android Family Link Guide -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">How to Set Up Google Family Link</h5>
+                    </div>
+                    <div class="card-body">
+                        <ol class="guide-steps">
+                            <li class="mb-3">
+                                <strong>Download Family Link app</strong> on YOUR phone from Google Play Store
+                            </li>
+                            <li class="mb-3">
+                                <strong>Open the app</strong> and tap "Get Started"
+                            </li>
+                            <li class="mb-3">
+                                <strong>Select "Parent"</strong> and sign in with your Google account
+                            </li>
+                            <li class="mb-3">
+                                <strong>Add your child's device</strong> by entering their Google account
+                            </li>
+                            <li class="mb-3">
+                                <strong>Follow the setup wizard</strong> to configure restrictions
+                            </li>
+                        </ol>
+                        <p class="text-muted mt-3">
+                            <strong>Note:</strong> Your child must have a Google account and their device nearby during setup.
+                        </p>
+                    </div>
+                </div>
+            }
+            else if (Model.DeviceType == "Windows")
+            {
+                <!-- Windows Family Safety Guide -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">How to Enable Microsoft Family Safety</h5>
+                    </div>
+                    <div class="card-body">
+                        <ol class="guide-steps">
+                            <li class="mb-3">
+                                <strong>Go to</strong> <a href="https://account.microsoft.com/family" target="_blank">account.microsoft.com/family</a>
+                            </li>
+                            <li class="mb-3">
+                                <strong>Sign in</strong> with your Microsoft account
+                            </li>
+                            <li class="mb-3">
+                                <strong>Click "Add a family member"</strong> → "Add a child"
+                            </li>
+                            <li class="mb-3">
+                                <strong>Enter your child's email</strong> or create a new account for them
+                            </li>
+                            <li class="mb-3">
+                                <strong>On their Windows PC</strong>, have them sign in with that account
+                            </li>
+                            <li class="mb-3">
+                                <strong>Back in Family Safety</strong>, configure Screen Time, App Limits, and Content Filters
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            }
+
+            <!-- Need Help Section -->
+            <div class="card border-secondary mb-4">
+                <div class="card-body text-center">
+                    <h5><i class="bi bi-question-circle"></i> Need More Help?</h5>
+                    <p class="text-muted">Detailed photo guides with screenshots are being created this week.</p>
+                    <a href="/Setup/Start" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-left"></i> Back to Setup Wizard
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    .guide-steps li {
+        font-size: 1.1rem;
+        line-height: 1.6;
+    }
+    .guide-steps strong {
+        color: #0d6efd;
+    }
+</style>

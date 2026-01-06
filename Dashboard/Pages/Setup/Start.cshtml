@@ -1,0 +1,168 @@
+@page
+@model StartModel
+@{
+    ViewData["Title"] = "Setup Wizard";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-5 fw-bold">🛡️ Let's Protect Your Child</h1>
+                <p class="lead text-muted">Answer a few questions and get personalized recommendations</p>
+            </div>
+
+            <!-- Setup Form -->
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <form method="post">
+                        
+                        <!-- Step 1: Device Type -->
+                        <div class="mb-5">
+                            <h4 class="mb-3">What device does your child use?</h4>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <input type="radio" class="btn-check" name="DeviceType" id="device-ios" value="iOS" required>
+                                    <label class="btn btn-outline-primary w-100 py-4 device-btn" for="device-ios">
+                                        <div class="fs-1 mb-2">📱</div>
+                                        <div class="fw-bold">iPhone/iPad</div>
+                                        <small class="text-muted">iOS Screen Time</small>
+                                    </label>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="radio" class="btn-check" name="DeviceType" id="device-android" value="Android">
+                                    <label class="btn btn-outline-success w-100 py-4 device-btn" for="device-android">
+                                        <div class="fs-1 mb-2">📱</div>
+                                        <div class="fw-bold">Android</div>
+                                        <small class="text-muted">Family Link</small>
+                                    </label>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="radio" class="btn-check" name="DeviceType" id="device-windows" value="Windows">
+                                    <label class="btn btn-outline-info w-100 py-4 device-btn" for="device-windows">
+                                        <div class="fs-1 mb-2">💻</div>
+                                        <div class="fw-bold">Windows PC</div>
+                                        <small class="text-muted">Family Safety</small>
+                                    </label>
+                                </div>
+                            </div>
+                            <span asp-validation-for="DeviceType" class="text-danger"></span>
+                        </div>
+
+                        <!-- Step 2: Child's Age -->
+                        <div class="mb-5">
+                            <h4 class="mb-3">How old is your child?</h4>
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <input type="range" class="form-range" id="ageSlider" name="ChildAge" 
+                                           min="0" max="17" value="8" step="1" required>
+                                    <div class="d-flex justify-content-between text-muted small">
+                                        <span>0</span>
+                                        <span>5</span>
+                                        <span>10</span>
+                                        <span>15</span>
+                                        <span>17+</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-center">
+                                    <div class="display-4 fw-bold text-primary" id="ageDisplay">8</div>
+                                    <small class="text-muted">years old</small>
+                                </div>
+                            </div>
+                            <span asp-validation-for="ChildAge" class="text-danger"></span>
+                        </div>
+
+                        <!-- Step 3: Optional Concerns -->
+                        <div class="mb-4">
+                            <h4 class="mb-3">What concerns you most? <small class="text-muted">(Optional)</small></h4>
+                            <div class="row g-2">
+                                <div class="col-md-4 col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="Concerns" value="SocialMedia" id="concern1">
+                                        <label class="form-check-label" for="concern1">Social Media</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="Concerns" value="InappropriateContent" id="concern2">
+                                        <label class="form-check-label" for="concern2">Inappropriate Content</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="Concerns" value="ScreenTime" id="concern3">
+                                        <label class="form-check-label" for="concern3">Too Much Screen Time</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="Concerns" value="Gaming" id="concern4">
+                                        <label class="form-check-label" for="concern4">Gaming</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="Concerns" value="OnlineStrangers" id="concern5">
+                                        <label class="form-check-label" for="concern5">Online Strangers</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="Concerns" value="Cyberbullying" id="concern6">
+                                        <label class="form-check-label" for="concern6">Cyberbullying</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid gap-2 mt-5">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-magic"></i> Get AI Recommendations
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+            <!-- Why This Works -->
+            <div class="alert alert-info mt-4">
+                <h5 class="alert-heading"><i class="bi bi-info-circle"></i> How This Works</h5>
+                <p class="mb-0">
+                    Your child's device already has powerful parental controls built-in. 
+                    Our AI will recommend exactly what to enable based on their age and your concerns. 
+                    You'll get step-by-step guides to set everything up in minutes.
+                </p>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Age slider interaction
+        const ageSlider = document.getElementById('ageSlider');
+        const ageDisplay = document.getElementById('ageDisplay');
+        
+        ageSlider.addEventListener('input', function() {
+            ageDisplay.textContent = this.value;
+        });
+    </script>
+    
+    <style>
+        .device-btn {
+            transition: all 0.3s ease;
+        }
+        .device-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .btn-check:checked + .device-btn {
+            transform: scale(1.05);
+        }
+    </style>
+}

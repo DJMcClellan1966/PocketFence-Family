@@ -5,6 +5,8 @@ namespace PocketFence_AI.Dashboard.Pages.Setup;
 
 public class RecommendationsModel : PageModel
 {
+    private readonly FeedbackStore _feedbackStore;
+
     public string DeviceType { get; set; } = "";
     public int ChildAge { get; set; }
     public List<string> Concerns { get; set; } = new();
@@ -13,6 +15,21 @@ public class RecommendationsModel : PageModel
     public List<string> AppsToBlock { get; set; } = new();
     public List<string> AppsToAllow { get; set; } = new();
     public string? ErrorMessage { get; set; }
+    public bool FeedbackSubmitted { get; set; }
+
+    [BindProperty]
+    public int Rating { get; set; }
+
+    [BindProperty]
+    public List<string> ImplementedIds { get; set; } = new();
+
+    [BindProperty]
+    public string? Comments { get; set; }
+
+    public RecommendationsModel()
+    {
+        _feedbackStore = new FeedbackStore();
+    }
 
     public void OnGet()
     {
@@ -30,11 +47,64 @@ public class RecommendationsModel : PageModel
 
             // Generate AI recommendations
             GenerateRecommendations();
+
+            // Preserve data for potential feedback submission
+            TempData.Keep("DeviceType");
+            TempData.Keep("ChildAge");
+            TempData.Keep("Concerns");
         }
         else
         {
             ErrorMessage = "No setup data found. Please complete the setup wizard first.";
         }
+    }
+
+    public async Task<IActionResult> OnPostSubmitFeedbackAsync()
+    {
+        // Restore recommendation data
+        if (TempData["DeviceType"] is string deviceType &&
+            TempData["ChildAge"] is int age)
+        {
+            DeviceType = deviceType;
+            ChildAge = age;
+            
+            if (TempData["Concerns"] is string concernsStr)
+            {
+                Concerns = concernsStr.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
+            }
+
+            GenerateRecommendations();
+
+            // Create feedback object
+            var feedback = new RecommendationFeedback
+            {
+                Id = Guid.NewGuid().ToString(),
+                DeviceType = DeviceType,
+                ChildAge = ChildAge,
+                Concerns = Concerns,
+                RecommendationsShown = Recommendations.Select(r => r.Id).ToList(),
+                HelpfulnessRating = Rating,
+                ImplementedRecommendations = ImplementedIds,
+                SkippedRecommendations = Recommendations
+                    .Select(r => r.Id)
+                    .Except(ImplementedIds)
+                    .ToList(),
+                UserComments = Comments ?? "",
+                CreatedAt = DateTime.UtcNow
+            };
+
+            // Save feedback
+            await _feedbackStore.SaveFeedbackAsync(feedback);
+
+            FeedbackSubmitted = true;
+
+            // Keep data for display
+            TempData.Keep("DeviceType");
+            TempData.Keep("ChildAge");
+            TempData.Keep("Concerns");
+        }
+
+        return Page();
     }
 
     private void GenerateRecommendations()

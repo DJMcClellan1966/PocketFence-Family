@@ -121,6 +121,89 @@
                     </a>
                 </div>
 
+                <!-- Feedback Section -->
+                <div class="card shadow-sm mb-4 border-warning" id="feedbackSection">
+                    <div class="card-header bg-warning-subtle">
+                        <h5 class="mb-0"><i class="bi bi-star"></i> Help Us Improve</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">
+                            Your feedback helps us provide better recommendations to other parents. 
+                            <strong>All data is anonymous and never shared.</strong>
+                        </p>
+                        
+                        <form method="post" asp-page-handler="SubmitFeedback" id="feedbackForm">
+                            <!-- Star Rating -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">How helpful were these recommendations?</label>
+                                <div class="star-rating">
+                                    <input type="radio" name="Rating" value="5" id="star5" required>
+                                    <label for="star5" title="Excellent">⭐</label>
+                                    <input type="radio" name="Rating" value="4" id="star4">
+                                    <label for="star4" title="Very Good">⭐</label>
+                                    <input type="radio" name="Rating" value="3" id="star3">
+                                    <label for="star3" title="Good">⭐</label>
+                                    <input type="radio" name="Rating" value="2" id="star2">
+                                    <label for="star2" title="Fair">⭐</label>
+                                    <input type="radio" name="Rating" value="1" id="star1">
+                                    <label for="star1" title="Poor">⭐</label>
+                                </div>
+                            </div>
+
+                            <!-- Implementation Checklist -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Which recommendations did you implement?</label>
+                                <small class="text-muted d-block mb-2">(Check all that apply)</small>
+                                @foreach (var rec in Model.Recommendations)
+                                {
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="ImplementedIds" value="@rec.Id" id="impl-@rec.Id">
+                                        <label class="form-check-label" for="impl-@rec.Id">
+                                            @rec.Title
+                                        </label>
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Optional Comments -->
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Additional feedback <small class="text-muted">(Optional)</small></label>
+                                <textarea class="form-control" name="Comments" rows="3" 
+                                          placeholder="What worked well? What could be improved?"></textarea>
+                            </div>
+
+                            <!-- Privacy Notice -->
+                            <div class="alert alert-info small mb-3">
+                                <i class="bi bi-shield-check"></i> 
+                                <strong>Privacy Protected:</strong> We only store: device type, age, and which recommendations were helpful. 
+                                No names, emails, or personal information. 
+                                <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">Learn more</a>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-warning" id="feedbackSubmitBtn">
+                                    <span id="feedbackBtnNormal">
+                                        <i class="bi bi-send"></i> Submit Feedback
+                                    </span>
+                                    <span id="feedbackBtnLoading" class="d-none">
+                                        <span class="spinner-border spinner-border-sm me-2"></span>
+                                        Submitting...
+                                    </span>
+                                </button>
+                            </div>
+                        </form>
+
+                        @if (Model.FeedbackSubmitted)
+                        {
+                            <div class="alert alert-success mt-3 mb-0">
+                                <i class="bi bi-check-circle"></i> 
+                                <strong>Thank you!</strong> Your feedback helps us improve PocketFence for all parents.
+                            </div>
+                        }
+                    </div>
+                </div>
+
                 <!-- Save/Print Options -->
                 <div class="text-center">
                     <button class="btn btn-outline-secondary" onclick="window.print()">
@@ -136,6 +219,50 @@
     </div>
 </div>
 
+<!-- Privacy Modal -->
+<div class="modal fade" id="privacyModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-shield-check"></i> Privacy & Data Collection</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <h6>What we collect:</h6>
+                <ul>
+                    <li>Device type (iOS/Android/Windows)</li>
+                    <li>Child's age (number only)</li>
+                    <li>Your helpfulness rating (1-5 stars)</li>
+                    <li>Which recommendations you implemented</li>
+                    <li>Optional text feedback</li>
+                </ul>
+                
+                <h6 class="mt-3">What we DON'T collect:</h6>
+                <ul>
+                    <li>❌ Your name or email</li>
+                    <li>❌ Your child's name</li>
+                    <li>❌ IP addresses</li>
+                    <li>❌ Any personally identifiable information</li>
+                </ul>
+                
+                <h6 class="mt-3">How we use it:</h6>
+                <p>
+                    Your anonymous feedback helps us identify which recommendations are most helpful 
+                    and improve the AI for future parents. Data is aggregated (e.g., "85% of parents 
+                    implemented this recommendation").
+                </p>
+                
+                <p class="mb-0">
+                    <strong>You're in control:</strong> Submitting feedback is completely optional.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
         function copyToClipboard() {
@@ -144,5 +271,70 @@
                 alert('Copied to clipboard!');
             });
         }
+
+        // Star rating interactivity
+        const starLabels = document.querySelectorAll('.star-rating label');
+        const starInputs = document.querySelectorAll('.star-rating input');
+        
+        starInputs.forEach((input, index) => {
+            input.addEventListener('change', function() {
+                // Highlight selected stars
+                starLabels.forEach((label, i) => {
+                    if (i >= starInputs.length - index - 1) {
+                        label.style.color = '#ffc107';
+                    } else {
+                        label.style.color = '#ddd';
+                    }
+                });
+            });
+        });
+
+        // Feedback form submission with loading state
+        document.getElementById('feedbackForm')?.addEventListener('submit', function() {
+            document.getElementById('feedbackBtnNormal').classList.add('d-none');
+            document.getElementById('feedbackBtnLoading').classList.remove('d-none');
+            document.getElementById('feedbackSubmitBtn').disabled = true;
+        });
+
+        // Auto-check recommendation checkboxes when user checks implementation
+        document.querySelectorAll('input[name="ImplementedIds"]').forEach(implCheckbox => {
+            implCheckbox.addEventListener('change', function() {
+                const recId = this.value;
+                const recCheckbox = document.getElementById('rec-' + recId);
+                if (recCheckbox && this.checked) {
+                    recCheckbox.checked = true;
+                }
+            });
+        });
     </script>
+    
+    <style>
+        /* Star rating styles */
+        .star-rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+            gap: 5px;
+            font-size: 2rem;
+        }
+        
+        .star-rating input {
+            display: none;
+        }
+        
+        .star-rating label {
+            cursor: pointer;
+            color: #ddd;
+            transition: color 0.2s;
+        }
+        
+        .star-rating label:hover,
+        .star-rating label:hover ~ label {
+            color: #ffc107;
+        }
+        
+        .star-rating input:checked ~ label {
+            color: #ffc107;
+        }
+    </style>
 }
